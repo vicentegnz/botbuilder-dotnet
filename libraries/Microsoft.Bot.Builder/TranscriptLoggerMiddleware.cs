@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
@@ -118,7 +117,7 @@ namespace Microsoft.Bot.Builder
                         }
                         catch (Exception err)
                         {
-                            Trace.TraceError($"Transcript logActivity failed with {err}");
+                            System.Diagnostics.Trace.TraceError($"Transcript logActivity failed with {err}");
                         }
                     },
                     cancellationToken);

@@ -30,7 +30,7 @@ namespace Microsoft.Bot.Builder.Integration.ApplicationInsights.Core.Tests
         public void ConfigureServices(IServiceCollection services)
         {
             var botConfig = BotConfiguration.Load("testbot.bot", null);
-            services.AddBotApplicationInsights(botConfig, "invalidinstance");
+            services.AddBotApplicationInsights(botConfig);
 
             // Adding IConfiguration in sample test server.  Otherwise this appears to be 
             // registered.

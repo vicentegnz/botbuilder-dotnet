@@ -12,8 +12,9 @@ namespace Microsoft.Bot.Builder.Dialogs
     /// </summary>
     public abstract class Dialog
     {
+        internal static readonly Lazy<System.Diagnostics.DiagnosticSource> DefaultDiagnosticSource = new Lazy<System.Diagnostics.DiagnosticSource>(() => new System.Diagnostics.DiagnosticListener("Microsoft.BotBuilder.Dialogs"), LazyThreadSafetyMode.PublicationOnly);
+
         public static readonly DialogTurnResult EndOfTurn = new DialogTurnResult(DialogTurnStatus.Waiting);
-        private IBotTelemetryClient _telemetryClient;
 
         public Dialog(string dialogId)
         {
@@ -22,28 +23,10 @@ namespace Microsoft.Bot.Builder.Dialogs
                 throw new ArgumentNullException(nameof(dialogId));
             }
 
-            _telemetryClient = NullBotTelemetryClient.Instance;
             Id = dialogId;
         }
 
         public string Id { get; }
-
-        /// <summary>
-        /// Gets or sets the telemetry client for logging events.
-        /// </summary>
-        /// <value>The Telemetry Client logger.</value>
-        public IBotTelemetryClient TelemetryClient
-        {
-            get
-            {
-                return _telemetryClient;
-            }
-
-            set
-            {
-                _telemetryClient = value;
-            }
-        }
 
         /// <summary>
         /// Method called when a new dialog has been pushed onto the stack and is being activated.

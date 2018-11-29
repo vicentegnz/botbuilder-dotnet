@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq;
-using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Bot.Builder.ApplicationInsights;
 using Microsoft.Bot.Configuration;
@@ -18,87 +17,47 @@ namespace Microsoft.Bot.Builder.Integration.ApplicationInsights.Core
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> which specifies the contract for a collection of service descriptors.</param>
         /// <param name="botConfiguration">Bot configuration that contains the Application Insights configuration information.</param>
-        /// <param name="appInsightsServiceInstanceName">(OPTIONAL) Specifies a Application Insights instance name in the Bot configuration.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        public static IServiceCollection AddBotApplicationInsights(this IServiceCollection services, BotConfiguration botConfiguration, string appInsightsServiceInstanceName = null)
+        public static IServiceCollection AddBotApplicationInsights(this IServiceCollection services, BotConfiguration botConfiguration) =>
+            services.AddBotApplicationInsights(botConfiguration, null);
+
+        /// <summary>
+        /// Adds and configures services for Application Insights to the <see cref="IServiceCollection" />.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> which specifies the contract for a collection of service descriptors.</param>
+        /// <param name="botConfiguration">Bot configuration that contains the Application Insights configuration information.</param>
+        /// <param name="appInsightsInstanceName">The name of the Application Insights instance to resolve from the <paramref name="botConfiguration">config</paramref>.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        public static IServiceCollection AddBotApplicationInsights(this IServiceCollection services, BotConfiguration botConfiguration, string appInsightsInstanceName)
         {
             if (botConfiguration == null)
             {
                 throw new ArgumentNullException(nameof(botConfiguration));
             }
 
-            var appInsightsServices = botConfiguration.Services.OfType<AppInsightsService>();
+            var appInsightsConfigs = botConfiguration.Services.Where(s => s.Type == "appInsights");
 
-            AppInsightsService appInsightService = null;
-
-            // Validate the bot file is correct.
-            var instanceNameSpecified = appInsightsServiceInstanceName != null;
-            if (instanceNameSpecified)
+            if (appInsightsInstanceName != null)
             {
-                appInsightService = appInsightsServices.Where(ais => ais.Name == appInsightsServiceInstanceName).FirstOrDefault();
-                if (appInsightService == null)
-                {
-                    throw new ArgumentException($"No Application Insights Service instance with the specified name \"{appInsightsServiceInstanceName}\" was found in the {nameof(BotConfiguration)}");
-                }
-            }
-            else
-            {
-                appInsightService = appInsightsServices.FirstOrDefault();
+                appInsightsConfigs = appInsightsConfigs.Where(s => s.Name == appInsightsInstanceName);
             }
 
-            CreateBotTelemetry(services);
+            var appInsightsConfig = appInsightsConfigs.FirstOrDefault();
 
-            IBotTelemetryClient telemetryClient = null;
-            if (appInsightService != null)
+            if (appInsightsConfig == null)
             {
-                services.AddApplicationInsightsTelemetry(appInsightService.InstrumentationKey);
-                telemetryClient = new BotTelemetryClient(new TelemetryClient());
-            }
-            else
-            {
-                telemetryClient = NullBotTelemetryClient.Instance;
-            }
+                var exceptionMessage = appInsightsInstanceName == null ? 
+                                            "The .bot file is missing an Application Insights (appInsights) service." 
+                                                : 
+                                            $"The .bot file is an Application Insights (appInsights) service with the name \"{appInsightsInstanceName}\".";
 
-            services.AddSingleton(telemetryClient);
-
-            return services;
-        }
-
-        /// <summary>
-        /// Adds and configures services for Application Insights to the <see cref="IServiceCollection" />.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection"/> which specifies the contract for a collection of service descriptors.</param>
-        /// <param name="botTelemetryClient">Bot Telemetry Client that logs event information.</param>
-        /// <param name="instrumentationKey">If Bot Telemetry Client is using Application Insights, provide the instumentation key.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        public static IServiceCollection AddBotApplicationInsights(this IServiceCollection services, IBotTelemetryClient botTelemetryClient, string instrumentationKey = null)
-        {
-            if (botTelemetryClient == null)
-            {
-                throw new ArgumentNullException(nameof(botTelemetryClient));
+                throw new InvalidOperationException(exceptionMessage);
             }
 
-            CreateBotTelemetry(services);
-
-            // Start Application Insights
-            if (instrumentationKey != null)
-            {
-                services.AddApplicationInsightsTelemetry(instrumentationKey);
-            }
-
-            // Register the BotTelemetryClient
-            services.AddSingleton(botTelemetryClient);
-
-            return services;
-
-        }
-
-        private static void CreateBotTelemetry(IServiceCollection services)
-        {
             // Enables Bot Telemetry to save user/session id's as the bot user id and session
-            services.AddTransient<TelemetrySaveBodyASPMiddleware>();
             services.AddSingleton<ITelemetryInitializer, OperationCorrelationTelemetryInitializer>();
-            services.AddSingleton<ITelemetryInitializer, TelemetryBotIdInitializer>();
+            //services.AddSingleton<ITelemetryModule, DiagnosticSourceTelemetryModule>();
+            return services;
         }
     }
 }

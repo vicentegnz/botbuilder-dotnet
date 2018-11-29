@@ -32,28 +32,6 @@ namespace Microsoft.Bot.Builder.Dialogs
         }
 
         /// <summary>
-        /// Gets or sets or set the <see cref="IBotTelemetryClient"/> to use.
-        /// When setting this property, all the contained dialogs TelemetryClient properties are also set.
-        /// </summary>
-        /// <value>The <see cref="IBotTelemetryClient"/> to use when logging.</value>
-        public IBotTelemetryClient TelemetryClient
-        {
-            get
-            {
-                return _telemetryClient;
-            }
-
-            set
-            {
-                _telemetryClient = value ?? NullBotTelemetryClient.Instance;
-                foreach (var dialog in _dialogs.Values)
-                {
-                    dialog.TelemetryClient = _telemetryClient;
-                }
-            }
-        }
-
-        /// <summary>
         /// Adds a new dialog to the set and returns the added dialog.
         /// </summary>
         /// <param name="dialog">The dialog to add.</param>
@@ -71,7 +49,6 @@ namespace Microsoft.Bot.Builder.Dialogs
                 throw new ArgumentException($"DialogSet.Add(): A dialog with an id of '{dialog.Id}' already added.");
             }
 
-            dialog.TelemetryClient = _telemetryClient;
             _dialogs[dialog.Id] = dialog;
 
             return this;
@@ -92,7 +69,7 @@ namespace Microsoft.Bot.Builder.Dialogs
             var state = await _dialogState.GetAsync(turnContext, () => { return new DialogState(); }, cancellationToken).ConfigureAwait(false);
 
             // Create and return context
-            return new DialogContext(this, turnContext, state);
+            return new DialogContext(this, turnContext, state, Dialog.DefaultDiagnosticSource.Value);
         }
 
         /// <summary>

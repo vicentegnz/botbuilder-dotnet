@@ -32,7 +32,7 @@ namespace Microsoft.Bot.Builder.Integration.ApplicationInsights.Core.Tests
         {
             var botConfig = BotConfiguration.Load("testbot.bot", null);
 
-            services.AddBotApplicationInsights(botConfig, "instance2");
+            services.AddBotApplicationInsights(botConfig);
 
 
             // Adding IConfiguration in sample test server.  Otherwise this appears to be 
