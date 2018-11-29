@@ -42,25 +42,6 @@ namespace Microsoft.Bot.Builder.Integration.ApplicationInsights.Core.Tests
             Assert.IsTrue(true);
         }
 
-        [TestMethod]
-        public void ServiceResolution_MultipleAppInsights()
-        {
-            ArrangeBotFile("multiple_app_insights"); // Default bot file
-            ArrangeAppSettings(); // Default app settings
-            var server = new TestServer(new WebHostBuilder()
-                .UseStartup<StartupMultipleAppInsights>());
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void ServiceResolution_InvalidInstance()
-        {
-            ArrangeBotFile("multiple_app_insights"); // Default bot file
-            ArrangeAppSettings(); // Default app settings
-            var server = new TestServer(new WebHostBuilder()
-                .UseStartup<StartupInvalidInstance>());
-        }
-
         /// <summary>
         /// Prepare appsettings.json for test
         /// </summary>
