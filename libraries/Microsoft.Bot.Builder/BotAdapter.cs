@@ -171,7 +171,7 @@ namespace Microsoft.Bot.Builder
         {
             BotAssert.ContextNotNull(turnContext);
 
-            _diagnosticSource.StartRunPipelineAsyncActivity(turnContext);
+            var runPipelineAsyncDiagnosticActivity = _diagnosticSource.StartRunPipelineAsyncActivity(turnContext);
 
             var exception = default(Exception);
 
@@ -209,7 +209,7 @@ namespace Microsoft.Bot.Builder
             }
             finally
             {
-                _diagnosticSource.StopBotAdapterRunPipelineAsyncActivity(turnContext, exception);
+                _diagnosticSource.StopBotAdapterRunPipelineAsyncActivity(runPipelineAsyncDiagnosticActivity, turnContext, exception);
             }
         }
     }

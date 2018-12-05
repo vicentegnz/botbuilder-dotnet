@@ -9,20 +9,21 @@ namespace Microsoft.Bot.Builder.Diagnostics
     internal static class BotAdapterDiagnosticSourceExtensions
     {
         private const string RunPipelineAsyncEventName = "Microsoft.BotBuilder.Core.BotAdapter.RunPipelineAsync";
-        private const string RunPipelineAsyncTurnStateKey = "BotBuilder.Activities.BotAdapter::RunPipelineAsync";
 
-        public static void StartRunPipelineAsyncActivity(this DiagnosticSource diagnosticSource, ITurnContext turnContext)
+        public static Activity StartRunPipelineAsyncActivity(this DiagnosticSource diagnosticSource, ITurnContext turnContext)
         {
-            if (diagnosticSource.IsEnabled(RunPipelineAsyncEventName, turnContext))
+            if (!diagnosticSource.IsEnabled(RunPipelineAsyncEventName, turnContext))
             {
-                StartActivity();
+                return null;
             }
 
-            void StartActivity()
+            return StartActivity();
+
+            Activity StartActivity()
             {
                 var activity = turnContext.Activity;
-                
-                var runPipelineAsyncDiagnosticActivity = new Activity("BotAdapter::RunPipelineAsync")
+
+                var runPipelineAsyncDiagnosticActivity = new Activity(RunPipelineAsyncEventName)
                     .AddBaggage("BotBuilder.Activity.Id", activity.Id)
                     .AddBaggage("BotBuilder.Activity.Conversation.Id", activity.Conversation.Id)
                     .AddTag("BotBuilder.Activity.Type", activity.Type)
@@ -30,22 +31,15 @@ namespace Microsoft.Bot.Builder.Diagnostics
 
                 diagnosticSource.StartActivity(runPipelineAsyncDiagnosticActivity, new { TurnContext = turnContext });
 
-                turnContext.TurnState.Add(RunPipelineAsyncTurnStateKey, runPipelineAsyncDiagnosticActivity);
+                return runPipelineAsyncDiagnosticActivity;
             }
         }
 
-        public static void StopBotAdapterRunPipelineAsyncActivity(this DiagnosticSource diagnosticSource, ITurnContext turnContext, Exception exception = null)
+        public static void StopBotAdapterRunPipelineAsyncActivity(this DiagnosticSource diagnosticSource, Activity runPipelineAsyncDiagnosticActivity, ITurnContext turnContext, Exception exception = null)
         {
-            if (diagnosticSource.IsEnabled(RunPipelineAsyncEventName, turnContext))
-            {
-                StopActivity();
-            }
-
-            void StopActivity()
+            if (runPipelineAsyncDiagnosticActivity != null)
             {
                 var turnState = turnContext.TurnState;
-                var runPipelineAsyncDiagnosticActivity = turnState[RunPipelineAsyncTurnStateKey] as Activity;
-                turnState.Remove(RunPipelineAsyncTurnStateKey);
 
                 runPipelineAsyncDiagnosticActivity.AddTag("BotBuilder.TurnContext.Responded", turnContext.Responded.ToString());
 

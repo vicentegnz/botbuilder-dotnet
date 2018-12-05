@@ -15,12 +15,10 @@ namespace Microsoft.Bot.Builder.Dialogs
     {
         private readonly IStatePropertyAccessor<DialogState> _dialogState;
         private readonly IDictionary<string, Dialog> _dialogs = new Dictionary<string, Dialog>();
-        private IBotTelemetryClient _telemetryClient;
 
         public DialogSet(IStatePropertyAccessor<DialogState> dialogState)
         {
             _dialogState = dialogState ?? throw new ArgumentNullException($"missing {nameof(dialogState)}");
-            _telemetryClient = NullBotTelemetryClient.Instance;
         }
 
         internal DialogSet()
@@ -28,7 +26,6 @@ namespace Microsoft.Bot.Builder.Dialogs
             // TODO: This is only used by ComponentDialog and future release
             // will refactor to use IStatePropertyAccessor from context
             _dialogState = null;
-            _telemetryClient = NullBotTelemetryClient.Instance;
         }
 
         /// <summary>
