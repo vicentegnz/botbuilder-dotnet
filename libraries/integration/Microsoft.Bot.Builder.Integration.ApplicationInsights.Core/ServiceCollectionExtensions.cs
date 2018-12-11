@@ -4,7 +4,6 @@
 using System;
 using System.Linq;
 using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.Bot.Builder.ApplicationInsights;
 using Microsoft.Bot.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
