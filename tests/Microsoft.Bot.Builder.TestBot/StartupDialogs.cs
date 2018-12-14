@@ -2,17 +2,13 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
-using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Bot.Builder.TestBot
 {
@@ -71,51 +67,11 @@ namespace Microsoft.Bot.Builder.TestBot
                          * and injected with any dependencies that it needs automatically for the scope of the turn.
                          */
                         fb.AddRootDialog<MyRootDialog>()
+                          // NOTE: this is the replacement concept for ComponentDialog
+                          .AddMyReusableDialog("reusableDialog")
                           // This style API allow registering singleton Dialog instances such as the WaterfallDialog. Mainly this
                           // is for backwards compatibility as, IMNSHO, this is the not the best way to model this API in .NET.
-                          .AddDialogScope("myDialogScope", sdb =>
-                          {
-                              sdb.AddRootDialog<MyRootDialog>();
-                          })
-                          .AddDialog(
-                            new WaterfallDialog(
-                                "waterfall",
-                                async (sc, ct) =>
-                                {
-                                    await sc.Context.SendActivityAsync("first step").ConfigureAwait(false);
-
-                                    return await sc.PromptAsync(
-                                        "confirmPrompt",
-                                        new PromptOptions
-                                        {
-                                            Prompt = MessageFactory.Text("shall I keep going?"),
-                                        },
-                                        ct);
-                                },
-                                async (sc, ct) =>
-                                {
-                                    if (sc.Result is bool b && b == true)
-                                    {
-                                        return await sc.PromptAsync(
-                                            "confirmPrompt",
-                                            new PromptOptions
-                                            {
-                                                Prompt = MessageFactory.Text("ok, want to see a dialog scope in action?")
-                                            },
-                                            ct).ConfigureAwait(false);
-                                    }
-
-                                    return await sc.EndDialogAsync(cancellationToken: ct);
-                                },
-                                async (sc, ct) =>
-                                {
-                                    if (sc.Result is bool b && b == true)
-                                    {
-                                        return await sc.BeginDialogAsync("myDialogScope", cancellationToken: ct);
-                                    }
-
-                                    return await sc.EndDialogAsync(cancellationToken: ct);
-                                }))
+                          .AddDialog(BuildWaterfallDialogInline())
                           //.AddDialog<MyComponentDialog>("myComponentDialog")
                           // This is a helper extension method that enables cleaner registering prompts because they can be 
                           // more type constrained and also have a common pattern of taking a validator function as a parameter.
@@ -161,155 +117,46 @@ namespace Microsoft.Bot.Builder.TestBot
                 .UseStaticFiles()
                 .UseBotFramework();
         }
-    }
 
-    public sealed class MyRootDialog : Dialog
-    {
-        private readonly IMakeBelieveService _makeBelieveService;
-
-        public MyRootDialog(IMakeBelieveService makeBelieveService)
-        {
-            _makeBelieveService = makeBelieveService;
-        }
-
-        public override async Task<DialogTurnResult> BeginDialogAsync(DialogContext dc, object options = null, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            if (dc.Context.Activity.Type == ActivityTypes.ConversationUpdate
-                    &&
-                dc.Context.Activity.MembersAdded[0].Id != dc.Context.Activity.Recipient.Id)
-            {
-                await dc.Context.SendActivityAsync("Welcome to the future of Dialogs!").ConfigureAwait(false);
-            }
-
-            return new DialogTurnResult(DialogTurnStatus.Waiting);
-        }
-
-        public override async Task<DialogTurnResult> ContinueDialogAsync(DialogContext dc, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            if (dc.Context.Activity.Type != ActivityTypes.Message)
-            {
-                return new DialogTurnResult(DialogTurnStatus.Waiting);
-            }
-
-            await _makeBelieveService.MakeBelieveAsync();
-
-            dc.ActiveDialog.State["currentStatus"] = "pendingConfirmationPrompt";
-
-            return await dc.PromptAsync(
-                "confirmPrompt",
-                new PromptOptions
+        private Dialog BuildWaterfallDialogInline() =>
+            new WaterfallDialog(
+                "waterfall",
+                async (sc, ct) =>
                 {
-                    Prompt = MessageFactory.Text("Are you ready?"),
-                    RetryPrompt = MessageFactory.Text("I asked if you were ready...?"),
-                },
-                cancellationToken).ConfigureAwait(false);
-        }
+                    await sc.Context.SendActivityAsync("first step").ConfigureAwait(false);
 
-        public override async Task<DialogTurnResult> ResumeDialogAsync(DialogContext dc, DialogReason reason, object result = null, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            if (reason == DialogReason.EndCalled)
-            {
-                switch (dc.ActiveDialog.State["currentStatus"] as string)
-                {
-                    case "pendingConfirmationPrompt":
-                        if ((bool)result == false)
+                    return await sc.PromptAsync(
+                        "confirmPrompt",
+                        new PromptOptions
                         {
-                            await dc.Context.SendActivityAsync("Too bad, you don't know what you're missing.").ConfigureAwait(false);
-                            await dc.Context.SendActivityAsync(new Activity { Type = ActivityTypes.EndOfConversation });
+                            Prompt = MessageFactory.Text("shall I keep going?"),
+                        },
+                        ct);
+                },
+                async (sc, ct) =>
+                {
+                    if (sc.Result is bool b && b == true)
+                    {
+                        return await sc.PromptAsync(
+                            "confirmPrompt",
+                            new PromptOptions
+                            {
+                                Prompt = MessageFactory.Text("ok, want to see a dialog scope in action?")
+                            },
+                            ct).ConfigureAwait(false);
+                    }
 
-                            return await dc.EndDialogAsync();
-                        }
+                    return await sc.EndDialogAsync(cancellationToken: ct);
+                },
+                async (sc, ct) =>
+                {
+                    if (sc.Result is bool b && b == true)
+                    {
+                        return await sc.BeginDialogAsync("reusableDialog", cancellationToken: ct);
+                    }
 
-                        dc.ActiveDialog.State["currentStatus"] = "showingWaterfall";
+                    return await sc.EndDialogAsync(cancellationToken: ct);
+                });
 
-                        return await dc.BeginDialogAsync("waterfall", cancellationToken: cancellationToken).ConfigureAwait(false);
-
-                    default:
-                        await dc.Context.SendActivityAsync("Hope you enjoyed it! See ya next time!");
-                        await dc.Context.SendActivityAsync(new Activity { Type = ActivityTypes.EndOfConversation });
-
-                        return await dc.EndDialogAsync();
-                }
-            }
-
-            return await base.ResumeDialogAsync(dc, reason, result, cancellationToken).ConfigureAwait(false);
-        }
     }
-
-    public interface IMakeBelieveService
-    {
-        Task MakeBelieveAsync();
-    }
-
-    public sealed class MyComponentDialogsDefaultMakeBelieveService : IMakeBelieveService
-    {
-        private readonly ILogger<MyComponentDialogsDefaultMakeBelieveService> _logger;
-
-        public MyComponentDialogsDefaultMakeBelieveService(ILogger<MyComponentDialogsDefaultMakeBelieveService> logger)
-        {
-            _logger = logger;
-        }
-
-        public async Task MakeBelieveAsync()
-        {
-            _logger.LogInformation("I'm not so sure...");
-
-            await Task.Delay(5000);
-        }
-    }
-
-    public sealed class MyReallyAwesomeMakeBelieveService : IMakeBelieveService
-    {
-        private readonly ILogger<MyReallyAwesomeMakeBelieveService> _logger;
-
-        public MyReallyAwesomeMakeBelieveService(ILogger<MyReallyAwesomeMakeBelieveService> logger)
-        {
-            _logger = logger;
-        }
-
-        public async Task MakeBelieveAsync()
-        {
-            _logger.LogInformation("I'm a believer!");
-
-            await Task.Delay(500);
-        }
-    }
-
-    public sealed class MyDialogsBotWithStartOver : DialogsBot
-    {
-        private readonly ILogger<MyDialogsBotWithStartOver> _logger;
-
-        public MyDialogsBotWithStartOver(IDialogFactory dialogFactory, IStatePropertyAccessor<DialogState> dialogStatePropertyAccessor, ILogger<MyDialogsBotWithStartOver> logger)
-            : base(dialogFactory, dialogStatePropertyAccessor)
-        {
-            _logger = logger;
-        }
-
-        protected override async Task<bool> OnBeforeExecuteNextDialogTurnAsync(DialogContext dialogContext, CancellationToken cancellationToken)
-        {
-            _logger.LogInformation("Before executing next dialog...");
-
-            var activity = dialogContext.Context.Activity;
-
-            if (activity.Type == ActivityTypes.Message
-                    &&
-                activity.Text.Equals("start over", StringComparison.InvariantCultureIgnoreCase))
-            {
-                _logger.LogWarning("User requested to start over!");
-
-                await dialogContext.CancelAllDialogsAsync(cancellationToken);
-            }
-
-            return true;
-        }
-
-        protected override Task OnAfterExecuteDialogTurnAsync(DialogContext dialogContext, CancellationToken cancellationToken)
-        {
-            _logger.LogInformation("After executing dialog...");
-
-            return Task.CompletedTask;
-        }
-    }
-
-
 }
