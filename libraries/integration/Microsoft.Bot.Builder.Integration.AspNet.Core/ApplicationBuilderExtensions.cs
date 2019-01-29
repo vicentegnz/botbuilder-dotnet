@@ -71,5 +71,49 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
 
             return applicationBuilder;
         }
+
+        /// <summary>
+        /// Maps various endpoint handlers for the <see cref="ServiceCollectionExtensions.AddBot{TBot}(IServiceCollection, Action{BotFrameworkOptions})">registered bot</see> into the request execution pipeline using the V4 protocol
+        /// </summary>
+        /// <param name="applicationBuilder">The <see cref="IApplicationBuilder"/>.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        public static IApplicationBuilder UseBotFrameworkV4(this IApplicationBuilder applicationBuilder)
+        {
+            if (applicationBuilder == null)
+            {
+                throw new ArgumentNullException(nameof(applicationBuilder));
+            }
+
+            var applicationServices = applicationBuilder.ApplicationServices;
+
+            var options = applicationServices.GetRequiredService<IOptions<BotFrameworkOptions>>().Value;
+
+            var bot = applicationServices.GetRequiredService<IBot>();
+            var adapter = applicationServices.GetRequiredService<BotFrameworkV4Adapter>();
+            adapter.Initialize(bot);
+
+            //var paths = options.Paths;
+
+            //var templatePath = paths.BasePath + paths.MessagesPath;
+            //if (templatePath.StartsWith("/"))
+            //{
+            //    templatePath = templatePath.Substring(1);
+            //}
+
+            //applicationBuilder.UseMvc(routes =>
+            //{
+            //    routes.MapRoute(
+            //        name: "bfv4incoming",
+            //        template: templatePath + "/incoming/{id}",
+            //        defaults: new { controller = "Stream", action = "CreateIncomingStream" });
+
+            //    routes.MapRoute(
+            //        name: "bfv4outgoing",
+            //        template: templatePath + "/outgoing/{id}",
+            //        defaults: new { controller = "Stream", action = "CreateOutgoingStream" });
+            //});
+
+            return applicationBuilder;
+        }
     }
 }

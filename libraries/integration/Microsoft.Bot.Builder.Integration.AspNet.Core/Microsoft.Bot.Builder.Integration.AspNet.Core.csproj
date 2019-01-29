@@ -52,8 +52,16 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Streaming\BotFrameworkV4WSAdapter.cs" />
+	  <Compile Remove="Streaming\SocketConnection.cs" />
+	  <Compile Remove="Streaming\SocketServer.cs" />
+	  <Compile Remove="Streaming\StreamController.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="AsyncUsageAnalyzers" Version="1.0.0-alpha003" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="2.1.1" />
     <PackageReference Include="Microsoft.Bot.Builder" Condition=" '$(PackageVersion)' == '' " Version="4.0.0-local" />
     <PackageReference Include="Microsoft.Bot.Builder" Condition=" '$(PackageVersion)' != '' " Version="$(PackageVersion)" />
