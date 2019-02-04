@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
 using Newtonsoft.Json;
 
-namespace Microsoft.Bot.Builder.Integration.AspNet.Core.Streaming
+namespace Microsoft.Bot.Builder.Integration.AspNet.Core
 {
     internal class BotRequestHandler : StreamRequestHandler
     {
