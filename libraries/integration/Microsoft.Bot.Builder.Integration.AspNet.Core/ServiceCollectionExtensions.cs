@@ -43,7 +43,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
 
             return services
                 .TryAddBotFrameworkAdapterIntegration()
-                .AddBotFrameworkAdapterV4Integration()
+                .AddNamedPipeAdapter()
                 .AddTransient<IBot, TBot>();
         }
 
@@ -76,7 +76,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
 
             return services
                 .TryAddBotFrameworkAdapterIntegration()
-                .AddBotFrameworkAdapterV4Integration()
+                .AddNamedPipeAdapter()
                 .AddSingleton<IBot>(bot);
         }
 
@@ -113,7 +113,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
 
             return services
                 .TryAddBotFrameworkAdapterIntegration()
-                .AddBotFrameworkAdapterV4Integration()
+                .AddNamedPipeAdapter()
                 .AddTransient<IBot>(botFactory);
         }
 
@@ -184,14 +184,14 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
             return botFrameworkAdapter;
         }
 
-        private static IServiceCollection AddBotFrameworkAdapterV4Integration(this IServiceCollection services)
+        private static IServiceCollection AddNamedPipeAdapter(this IServiceCollection services)
         {
             if (services == null)
             {
                 throw new ArgumentNullException(nameof(services));
             }
 
-            var adapter = new BotFrameworkV4Adapter();
+            var adapter = new NamedPipeBotAdapter();
 
             services.AddSingleton(adapter);
 

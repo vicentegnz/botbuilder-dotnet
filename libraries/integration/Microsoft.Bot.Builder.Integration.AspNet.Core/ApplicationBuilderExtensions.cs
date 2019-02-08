@@ -77,7 +77,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
         /// </summary>
         /// <param name="applicationBuilder">The <see cref="IApplicationBuilder"/>.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        public static IApplicationBuilder UseBotFrameworkV4(this IApplicationBuilder applicationBuilder)
+        public static IApplicationBuilder UseBotFrameworkNamedPipe(this IApplicationBuilder applicationBuilder)
         {
             if (applicationBuilder == null)
             {
@@ -89,29 +89,8 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
             var options = applicationServices.GetRequiredService<IOptions<BotFrameworkOptions>>().Value;
 
             var bot = applicationServices.GetRequiredService<IBot>();
-            var adapter = applicationServices.GetRequiredService<BotFrameworkV4Adapter>();
+            var adapter = applicationServices.GetRequiredService<NamedPipeBotAdapter>();
             adapter.Initialize(bot);
-
-            //var paths = options.Paths;
-
-            //var templatePath = paths.BasePath + paths.MessagesPath;
-            //if (templatePath.StartsWith("/"))
-            //{
-            //    templatePath = templatePath.Substring(1);
-            //}
-
-            //applicationBuilder.UseMvc(routes =>
-            //{
-            //    routes.MapRoute(
-            //        name: "bfv4incoming",
-            //        template: templatePath + "/incoming/{id}",
-            //        defaults: new { controller = "Stream", action = "CreateIncomingStream" });
-
-            //    routes.MapRoute(
-            //        name: "bfv4outgoing",
-            //        template: templatePath + "/outgoing/{id}",
-            //        defaults: new { controller = "Stream", action = "CreateOutgoingStream" });
-            //});
 
             return applicationBuilder;
         }

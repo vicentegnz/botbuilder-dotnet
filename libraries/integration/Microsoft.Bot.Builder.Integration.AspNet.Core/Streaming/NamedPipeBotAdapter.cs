@@ -11,16 +11,16 @@ using Newtonsoft.Json;
 
 namespace Microsoft.Bot.Builder.Integration.AspNet.Core
 {
-    public class BotFrameworkV4Adapter : BotAdapter
+    public class NamedPipeBotAdapter : BotAdapter
     {
         private const string InvokeReponseKey = "BotFrameworkAdapter.InvokeResponse";
 
-        internal PipeServer Server { get; private set; }
+        private NamedPipeServer _server;
 
         public void Initialize(IBot bot)
         {
-            Server = new PipeServer("bfv4.pipes", new BotRequestHandler(this, bot));
-            Task.Run(() => Server.StartAsync());
+            _server = new NamedPipeServer("bfv4.pipes", new BotRequestHandler(this, bot));
+            Task.Run(() => _server.StartAsync());
         }
 
         /// <summary>
@@ -52,30 +52,23 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
         {
             BotAssert.ActivityNotNull(activity);
 
-            //var claimsIdentity = await JwtTokenValidation.AuthenticateRequest(activity, authHeader, _credentialProvider, _channelProvider, _httpClient).ConfigureAwait(false);
-            return await ProcessActivityAsync((ClaimsIdentity)null, activity, callback, cancellationToken).ConfigureAwait(false);
+            return await ProcessActivityAsync(activity, callback, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
         /// Creates a turn context and runs the middleware pipeline for an incoming activity.
         /// </summary>
-        /// <param name="identity">A <see cref="ClaimsIdentity"/> for the request.</param>
         /// <param name="activity">The incoming activity.</param>
         /// <param name="callback">The code to run at the end of the adapter's middleware pipeline.</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
-        public async Task<InvokeResponse> ProcessActivityAsync(ClaimsIdentity identity, Activity activity, BotCallbackHandler callback, CancellationToken cancellationToken)
+        public async Task<InvokeResponse> ProcessActivityAsync(Activity activity, BotCallbackHandler callback, CancellationToken cancellationToken)
         {
             BotAssert.ActivityNotNull(activity);
-            
+
             using (var context = new TurnContext(this, activity))
             {
-                //context.TurnState.Add<IIdentity>(BotIdentityKey, identity);
-
-                //var connectorClient = await CreateConnectorClientAsync(activity.ServiceUrl, identity, cancellationToken).ConfigureAwait(false);
-                //context.TurnState.Add(connectorClient);
-
                 await RunPipelineAsync(context, callback, cancellationToken).ConfigureAwait(false);
 
                 // Handle Invoke scenarios, which deviate from the request/response model in that
@@ -98,7 +91,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
                 return null;
             }
         }
-        
+
         public override async Task<ResourceResponse[]> SendActivitiesAsync(ITurnContext turnContext, Activity[] activities, CancellationToken cancellationToken)
         {
             if (turnContext == null)
@@ -127,12 +120,12 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
             {
                 var activity = activities[index];
                 var response = default(ResourceResponse);
-                
+
                 if (activity.Type == ActivityTypesEx.Delay)
                 {
                     // The Activity Schema doesn't have a delay type build in, so it's simulated
                     // here in the Bot. This matches the behavior in the Node connector.
-                    int delayMs = (int)activity.Value;
+                    var delayMs = (int)activity.Value;
                     await Task.Delay(delayMs, cancellationToken).ConfigureAwait(false);
 
                     // No need to create a response. One will be created below.
@@ -149,37 +142,32 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
                 }
                 else if (!string.IsNullOrWhiteSpace(activity.ReplyToId))
                 {
-                    //var connectorClient = turnContext.TurnState.Get<IConnectorClient>();
-                    //response = await connectorClient.Conversations.ReplyToActivityAsync(activity, cancellationToken).ConfigureAwait(false);
                     var conversationId = activity.Conversation.Id;
                     var activityId = activity.ReplyToId;
 
                     var requestVerb = "POST";
                     var baseUrl = activity.ServiceUrl + (activity.ServiceUrl.EndsWith("/") ? "" : "/");
                     var requestPath = $"{baseUrl}v3/conversations/{conversationId}/activities/{activityId}";
-                    var requestContent = JsonConvert.SerializeObject(activity, PipeConnection.SerializationSettings);
+                    var requestContent = JsonConvert.SerializeObject(activity, NamedPipeConnection.SerializationSettings);
                     var requestHeaders = new Dictionary<string, string>() { { "Content-Type", "application/json; charset=utf-8" } };
 
                     // use a SocketClient to send this request and await a response
-                    var socketResponse = await Server.SendAsync(requestVerb, requestPath, requestHeaders, requestContent);
-                    response = JsonConvert.DeserializeObject<ResourceResponse>(socketResponse.Body, PipeConnection.DeserializationSettings);
+                    var socketResponse = await _server.SendAsync(requestVerb, requestPath, requestHeaders, requestContent).ConfigureAwait(false);
+                    response = JsonConvert.DeserializeObject<ResourceResponse>(socketResponse.Body, NamedPipeConnection.DeserializationSettings);
                 }
                 else
                 {
-                    //var connectorClient = turnContext.TurnState.Get<IConnectorClient>();
-                    //response = await connectorClient.Conversations.SendToConversationAsync(activity, cancellationToken).ConfigureAwait(false);
-
                     var conversationId = activity.Conversation.Id;
 
                     var requestVerb = "POST";
                     var baseUrl = activity.ServiceUrl + (activity.ServiceUrl.EndsWith("/") ? "" : "/");
                     var requestPath = $"{baseUrl}v3/conversations/{conversationId}/activities";
-                    var requestContent = JsonConvert.SerializeObject(activity, PipeConnection.SerializationSettings);
+                    var requestContent = JsonConvert.SerializeObject(activity, NamedPipeConnection.SerializationSettings);
                     var requestHeaders = new Dictionary<string, string>() { { "Content-Type", "application/json; charset=utf-8" } };
 
                     // use a SocketClient to send this request and await a response
-                    var socketResponse = await Server.SendAsync(requestVerb, requestPath, requestHeaders, requestContent);
-                    response = JsonConvert.DeserializeObject<ResourceResponse>(socketResponse.Body, PipeConnection.DeserializationSettings);
+                    var socketResponse = await _server.SendAsync(requestVerb, requestPath, requestHeaders, requestContent).ConfigureAwait(false);
+                    response = JsonConvert.DeserializeObject<ResourceResponse>(socketResponse.Body, NamedPipeConnection.DeserializationSettings);
                 }
 
                 // If No response is set, then defult to a "simple" response. This can't really be done
@@ -206,7 +194,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
         {
             throw new NotImplementedException();
         }
-        
+
         public override Task DeleteActivityAsync(ITurnContext turnContext, ConversationReference reference, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();

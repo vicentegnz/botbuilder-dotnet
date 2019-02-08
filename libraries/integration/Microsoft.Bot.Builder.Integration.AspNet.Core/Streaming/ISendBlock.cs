@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Microsoft.Bot.Builder.Integration.AspNet.Core
 {
-    internal abstract class StreamRequestHandler<T>
+    internal interface ISendBlock<T>
     {
-        public abstract Task<T> ProcessRequestAsync(T request);
+        Task<T> GetAsync();
     }
 }

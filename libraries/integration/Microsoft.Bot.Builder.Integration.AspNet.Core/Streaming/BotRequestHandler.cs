@@ -9,21 +9,21 @@ using Newtonsoft.Json;
 
 namespace Microsoft.Bot.Builder.Integration.AspNet.Core
 {
-    internal class BotRequestHandler : StreamRequestHandler
+    internal class BotRequestHandler : StreamRequestHandler<StreamMessage>
     {
-        public BotRequestHandler(BotFrameworkV4Adapter adapter, IBot bot)
+        public BotRequestHandler(NamedPipeBotAdapter adapter, IBot bot)
         {
             this.Adapter = adapter;
             this.Bot = bot;
         }
 
-        private BotFrameworkV4Adapter Adapter { get; set; }
+        private NamedPipeBotAdapter Adapter { get; set; }
 
         private IBot Bot { get; set; }
 
         public override async Task<StreamMessage> ProcessRequestAsync(StreamMessage request)
         {
-            StreamMessage response = new StreamMessage()
+            var response = new StreamMessage()
             {
                 RequestId = request.RequestId,
             };
@@ -48,16 +48,16 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
                 return response;
             }
 
-            Activity activity = (Activity)JsonConvert.DeserializeObject<Activity>(request.Body, PipeConnection.DeserializationSettings);
+            var activity = JsonConvert.DeserializeObject<Activity>(request.Body, NamedPipeConnection.DeserializationSettings);
             try
             {
-                string token = (string)null;
+                var token = (string)null;
                 if (request.Headers != null)
                 {
                     request.Headers.TryGetValue("Authorization", out token);
                 }
 
-                InvokeResponse invokeResponse = await this.Adapter.ProcessActivityAsync(token, activity, new BotCallbackHandler(this.Bot.OnTurnAsync), CancellationToken.None).ConfigureAwait(false);
+                var invokeResponse = await this.Adapter.ProcessActivityAsync(token, activity, new BotCallbackHandler(this.Bot.OnTurnAsync), CancellationToken.None).ConfigureAwait(false);
                 if (invokeResponse == null)
                 {
                     response.StatusCode = 200;
@@ -71,7 +71,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
                         {
                               { "Content-Type", "application/json" },
                         };
-                        response.Body = JsonConvert.SerializeObject(invokeResponse.Body, PipeConnection.SerializationSettings);
+                        response.Body = JsonConvert.SerializeObject(invokeResponse.Body, NamedPipeConnection.SerializationSettings);
                     }
                 }
 

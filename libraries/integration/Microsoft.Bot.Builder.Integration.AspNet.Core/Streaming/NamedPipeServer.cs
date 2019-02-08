@@ -11,34 +11,30 @@ using Newtonsoft.Json;
 
 namespace Microsoft.Bot.Builder.Integration.AspNet.Core
 {
-    internal class PipeServer
+    internal class NamedPipeServer
     {
         private readonly string _baseName;
-        private readonly StreamRequestHandler _requestHandler;
-        private PipeConnection _connection;
+        private readonly StreamRequestHandler<StreamMessage> _requestHandler;
+        private readonly NamedPipeConnection _connection;
+        private readonly bool _autoReconnect;
 
-        public PipeServer(string baseName, StreamRequestHandler requestHandler)
+        public NamedPipeServer(string baseName, StreamRequestHandler<StreamMessage> requestHandler, bool autoReconnect = true, NamedPipeConnectionInterrupt interrupt = null)
         {
             _baseName = baseName;
             _requestHandler = requestHandler;
+            _autoReconnect = autoReconnect;
 
-            _connection = new PipeConnection(_requestHandler);
+            _connection = new NamedPipeConnection(_requestHandler, interrupt);
             _connection.Disconnected += OnConnectionDisconnected;
-        }
-
-        private void OnConnectionDisconnected(object sender, EventArgs e)
-        {
-            // Try to rerun the server connection 
-            Task.Run(() => StartAsync());
         }
 
         public async Task StartAsync()
         {
-            var incomingPipeName = _baseName + PipeConnection.ServerIncomingPath;
+            var incomingPipeName = _baseName + NamedPipeConnection.ServerIncomingPath;
             var incomingServer = new NamedPipeServerStream(incomingPipeName, PipeDirection.In, NamedPipeServerStream.MaxAllowedServerInstances, PipeTransmissionMode.Byte, PipeOptions.WriteThrough | PipeOptions.Asynchronous);
             await incomingServer.WaitForConnectionAsync().ConfigureAwait(false);
 
-            var outgoingPipeName = _baseName + PipeConnection.ServerOutgoingPath;
+            var outgoingPipeName = _baseName + NamedPipeConnection.ServerOutgoingPath;
             var outgoingServer = new NamedPipeServerStream(outgoingPipeName, PipeDirection.Out, NamedPipeServerStream.MaxAllowedServerInstances, PipeTransmissionMode.Byte, PipeOptions.WriteThrough | PipeOptions.Asynchronous);
             await outgoingServer.WaitForConnectionAsync().ConfigureAwait(false);
 
@@ -53,6 +49,20 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
         public Task<StreamMessage> SendAsync(string method, string path, IDictionary<string, string> headers, string body = null)
         {
             return _connection.SendAsync(method, path, headers, body);
+        }
+
+        public void Disconnect()
+        {
+            _connection.Disconnect();
+        }
+
+        private void OnConnectionDisconnected(object sender, EventArgs e)
+        {
+            if (_autoReconnect)
+            {
+                // Try to rerun the server connection 
+                Background.Run(StartAsync);
+            }
         }
     }
 }
