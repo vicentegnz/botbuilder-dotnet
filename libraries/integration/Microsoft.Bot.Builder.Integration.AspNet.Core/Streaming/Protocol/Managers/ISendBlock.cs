@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Microsoft.Bot.Builder.Integration.AspNet.Core
+namespace Microsoft.Bot.Streaming.Protocol.Managers
 {
-    internal interface ISendBlock<T>
+    public interface ISendBlock<T>
     {
         Task<T> GetAsync();
     }

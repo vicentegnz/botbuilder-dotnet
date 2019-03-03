@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
+using Microsoft.Bot.Streaming;
+using Microsoft.Bot.Streaming.Protocol;
 using Newtonsoft.Json;
 
 namespace Microsoft.Bot.Builder.Integration.AspNet.Core
@@ -148,12 +152,13 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
                     var requestVerb = "POST";
                     var baseUrl = activity.ServiceUrl + (activity.ServiceUrl.EndsWith("/") ? "" : "/");
                     var requestPath = $"{baseUrl}v3/conversations/{conversationId}/activities/{activityId}";
-                    var requestContent = JsonConvert.SerializeObject(activity, NamedPipeConnection.SerializationSettings);
-                    var requestHeaders = new Dictionary<string, string>() { { "Content-Type", "application/json; charset=utf-8" } };
 
-                    // use a SocketClient to send this request and await a response
-                    var socketResponse = await _server.SendAsync(requestVerb, requestPath, requestHeaders, requestContent).ConfigureAwait(false);
-                    response = JsonConvert.DeserializeObject<ResourceResponse>(socketResponse.Body, NamedPipeConnection.DeserializationSettings);
+                    var requestContent = JsonConvert.SerializeObject(activity, SerializationSettings.BotSchemaSerializationSettings);
+                    var stringContent = new StringContent(requestContent, Encoding.UTF8, "application/json");
+
+                    var socketResponse = await _server.SendAsync(requestVerb, requestPath, null, stringContent).ConfigureAwait(false);
+
+                    response = socketResponse.ReadBodyAsJson<ResourceResponse>();
                 }
                 else
                 {
@@ -162,12 +167,13 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
                     var requestVerb = "POST";
                     var baseUrl = activity.ServiceUrl + (activity.ServiceUrl.EndsWith("/") ? "" : "/");
                     var requestPath = $"{baseUrl}v3/conversations/{conversationId}/activities";
-                    var requestContent = JsonConvert.SerializeObject(activity, NamedPipeConnection.SerializationSettings);
-                    var requestHeaders = new Dictionary<string, string>() { { "Content-Type", "application/json; charset=utf-8" } };
+                    var requestContent = JsonConvert.SerializeObject(activity, SerializationSettings.BotSchemaSerializationSettings);
+                    var stringContent = new StringContent(requestContent, Encoding.UTF8, "application/json");
 
                     // use a SocketClient to send this request and await a response
-                    var socketResponse = await _server.SendAsync(requestVerb, requestPath, requestHeaders, requestContent).ConfigureAwait(false);
-                    response = JsonConvert.DeserializeObject<ResourceResponse>(socketResponse.Body, NamedPipeConnection.DeserializationSettings);
+                    var socketResponse = await _server.SendAsync(requestVerb, requestPath, null, stringContent).ConfigureAwait(false);
+
+                    response = socketResponse.ReadBodyAsJson<ResourceResponse>();
                 }
 
                 // If No response is set, then defult to a "simple" response. This can't really be done

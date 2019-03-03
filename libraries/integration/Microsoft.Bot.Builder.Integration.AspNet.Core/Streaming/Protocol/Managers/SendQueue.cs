@@ -4,9 +4,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.Bot.Builder.Integration.AspNet.Core
+namespace Microsoft.Bot.Streaming.Protocol.Managers
 {
-    internal class SendQueue<T> : IDisposable
+    public class SendQueue<T> : IDisposable
     {
         private readonly Func<T, Task> _action;
 

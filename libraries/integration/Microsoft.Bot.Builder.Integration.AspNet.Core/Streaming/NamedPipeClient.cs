@@ -1,50 +1,52 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
 using System.IO.Pipes;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
+using Microsoft.Bot.Streaming.Protocol;
+using Microsoft.Bot.Streaming.Protocol.Managers;
+using Microsoft.Bot.Streaming.Transport;
 
-namespace Microsoft.Bot.Builder.Integration.AspNet.Core
+namespace Microsoft.Bot.Streaming
 {
-    internal class NamedPipeClient
+    public class NamedPipeClient
     {
         private readonly string _baseName;
-        private readonly StreamRequestHandler<StreamMessage> _requestHandler;
-        private readonly NamedPipeConnection _connection;
+        private readonly RequestHandler _requestHandler;
+        private readonly PacketManager _connection;
+        private readonly RequestManager _requestManager;
+        private readonly ProtocolAdapter _protocolAdapter;
         private readonly bool _autoReconnect;
 
-        public NamedPipeClient(string baseName, StreamRequestHandler<StreamMessage> requestHandler = null, bool autoReconnect = true, NamedPipeConnectionInterrupt interrupt = null)
+        public NamedPipeClient(string baseName, RequestHandler requestHandler = null, bool autoReconnect = true)
         {
             _baseName = baseName;
             _requestHandler = requestHandler;
             _autoReconnect = autoReconnect;
 
-            _connection = new NamedPipeConnection(_requestHandler, interrupt);
+            _connection = new PacketManager();
+            _requestManager = new RequestManager();
+            _protocolAdapter = new ProtocolAdapter(_requestHandler, _connection, _requestManager);
 
             _connection.Disconnected += OnConnectionDisconnected;
         }
         
         public async Task ConnectAsync()
         {
-            var outgoingPipeName = _baseName + NamedPipeConnection.ServerIncomingPath;
+            var outgoingPipeName = _baseName + NamedPipeTransport.ServerIncomingPath;
             var outgoing = new NamedPipeClientStream(".", outgoingPipeName, PipeDirection.Out, PipeOptions.WriteThrough | PipeOptions.Asynchronous);
             await outgoing.ConnectAsync().ConfigureAwait(false);
 
-            var incomingPipeName = _baseName + NamedPipeConnection.ServerOutgoingPath;
+            var incomingPipeName = _baseName + NamedPipeTransport.ServerOutgoingPath;
             var incoming = new NamedPipeClientStream(".", incomingPipeName, PipeDirection.In, PipeOptions.WriteThrough | PipeOptions.Asynchronous);
             await incoming.ConnectAsync().ConfigureAwait(false);
 
-            _connection.Connect(incoming, outgoing);
+            _connection.Connect(
+                new NamedPipeTransport(incoming),
+                new NamedPipeTransport(outgoing));
         }
 
-        public Task<StreamMessage> SendAsync(StreamMessage message)
+        public Task<ReceiveResponse> SendAsync(Request message)
         {
-            return _connection.SendAsync(message, true);
+            return _protocolAdapter.SendRequestAsync(message);
         }
 
         public void Disconnect()

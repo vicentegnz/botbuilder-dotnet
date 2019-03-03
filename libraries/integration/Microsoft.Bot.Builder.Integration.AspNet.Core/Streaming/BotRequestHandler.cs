@@ -4,12 +4,15 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Bot.Builder;
+using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Schema;
+using Microsoft.Bot.Streaming.Protocol;
 using Newtonsoft.Json;
 
-namespace Microsoft.Bot.Builder.Integration.AspNet.Core
+namespace Microsoft.Bot.Streaming
 {
-    internal class BotRequestHandler : StreamRequestHandler<StreamMessage>
+    internal class BotRequestHandler : RequestHandler
     {
         public BotRequestHandler(NamedPipeBotAdapter adapter, IBot bot)
         {
@@ -21,12 +24,9 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
 
         private IBot Bot { get; set; }
 
-        public override async Task<StreamMessage> ProcessRequestAsync(StreamMessage request)
+        public override async Task<Response> ProcessRequestAsync(ReceiveRequest request)
         {
-            var response = new StreamMessage()
-            {
-                RequestId = request.RequestId,
-            };
+            var response = new Response();
 
             if (string.IsNullOrEmpty(request.Method) || request.Method.ToUpperInvariant() != "POST")
             {
@@ -34,21 +34,26 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
                 return response;
             }
 
-            if (string.IsNullOrEmpty(request.Body))
+            var body = request.ReadBodyAsString();
+
+            if (string.IsNullOrEmpty(body) || request.ContentFeeds == null || request.ContentFeeds.Count == 0)
             {
+                // no body
                 response.StatusCode = 400;
                 return response;
             }
 
+            var contentHeaders = request.ContentFeeds[0].Headers;
+
             string contentType;
             MediaTypeHeaderValue mediaTypeHeaderValue;
-            if (request.Headers == null || !request.Headers.TryGetValue("Content-Type", out contentType) || !MediaTypeHeaderValue.TryParse(contentType, out mediaTypeHeaderValue) || mediaTypeHeaderValue.MediaType != "application/json")
+            if (!contentHeaders.TryGetValue("Content-Type", out contentType) || !MediaTypeHeaderValue.TryParse(contentType, out mediaTypeHeaderValue) || mediaTypeHeaderValue.MediaType != "application/json")
             {
                 response.StatusCode = 406;
                 return response;
             }
 
-            var activity = JsonConvert.DeserializeObject<Activity>(request.Body, NamedPipeConnection.DeserializationSettings);
+            var activity = JsonConvert.DeserializeObject<Activity>(body, SerializationSettings.DefaultDeserializationSettings);
             try
             {
                 var token = (string)null;
@@ -67,11 +72,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
                     response.StatusCode = invokeResponse.Status;
                     if (invokeResponse.Body != null)
                     {
-                        response.Headers = (IDictionary<string, string>)new Dictionary<string, string>()
-                        {
-                              { "Content-Type", "application/json" },
-                        };
-                        response.Body = JsonConvert.SerializeObject(invokeResponse.Body, NamedPipeConnection.SerializationSettings);
+                        response.SetBody(invokeResponse.Body);
                     }
                 }
 
