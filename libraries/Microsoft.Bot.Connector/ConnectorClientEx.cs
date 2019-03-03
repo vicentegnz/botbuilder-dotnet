@@ -37,9 +37,25 @@ namespace Microsoft.Bot.Connector
         /// <param name="addJwtTokenRefresher">(DEPRECATED)</param>
         /// <param name="handlers">Optional. The delegating handlers to add to the http client pipeline.</param>
         public ConnectorClient(Uri baseUri, MicrosoftAppCredentials credentials, bool addJwtTokenRefresher = true, params DelegatingHandler[] handlers)
+            : this(baseUri, credentials, null, addJwtTokenRefresher, handlers)
+        { }
+
+        /// <summary>
+        /// Create a new instance of the ConnectorClient class
+        /// </summary>
+        /// <param name="baseUri">Base URI for the Connector service</param>
+        /// <param name="credentials">Credentials for the Connector service</param>
+        /// <param name="customHttpClient">The HTTP client to be used by the connector client.</param>
+        /// <param name="addJwtTokenRefresher">(DEPRECATED)</param>
+        /// <param name="handlers">Optional. The delegating handlers to add to the http client pipeline.</param>
+        public ConnectorClient(Uri baseUri, MicrosoftAppCredentials credentials, HttpClient customHttpClient, bool addJwtTokenRefresher = true, params DelegatingHandler[] handlers)
             : this(baseUri, handlers)
         {
             this.Credentials = credentials;
+            if (customHttpClient != null)
+            {
+                this.HttpClient = customHttpClient;
+            }
         }
 
         /// <summary>
@@ -47,13 +63,17 @@ namespace Microsoft.Bot.Connector
         /// </summary>
         /// <param name="baseUri">Base URI for the Connector service</param>
         /// <param name="credentials">Credentials for the Connector service</param>
-        /// <param name="httpClientHandler">The httpClientHandler used by http client</param>
+        /// <param name="httpClientHandler">The HTTP client message handler to be used by the connector client.</param>
         /// <param name="addJwtTokenRefresher">(DEPRECATED)</param>
         /// <param name="handlers">Optional. The delegating handlers to add to the http client pipeline.</param>
-        public ConnectorClient(Uri baseUri, MicrosoftAppCredentials credentials, HttpClientHandler httpClientHandler, bool addJwtTokenRefresher = true, params DelegatingHandler[] handlers)
+        public ConnectorClient(Uri baseUri, MicrosoftAppCredentials credentials, HttpClientHandler httpClientHandler, bool addJwtTokenRefresher = true, HttpClient customHttpClient = null, params DelegatingHandler[] handlers)
             : this(baseUri, httpClientHandler, handlers)
         {
             this.Credentials = credentials;
+            if (customHttpClient != null)
+            {
+                this.HttpClient = customHttpClient;
+            }
         }
 
         partial void CustomInitialize()
