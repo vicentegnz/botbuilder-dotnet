@@ -1,0 +1,28 @@
+{
+    "$schema": "../../app.schema",
+    "$type": "Microsoft.AdaptiveDialog",
+    "rules": [
+        {
+            "$type": "Microsoft.DefaultRule",
+          "steps": [
+            {
+              "$type": "Microsoft.HttpRequest",
+              "url": "https://graph.microsoft.com/v1.0/me/messages",
+              "method": "GET",
+              "header": {
+                "Authorization": "Bearer EwBwA8l6BAAURSN/FHlDW5xN74t6GzbtsBBeBUYAASgFM7E2WIL6Ww/vkEIqCYPcZc/kpCYPBEvjWulBw91u/rlAVBGbR84dlTn+sWAJR/kzx3sElwX/p8R1XmtO0a8qGDt2cIHKW/n40oLdRbh67dYY0AD6NKAmmKqmp+HJ9ksH/GXB/tc7t6ieDdDK4QGGUwewCtYLAdHBK6hlpvt9eoFHKFJ0ZptF6lJ8EBA9HXnwKcSTpbO5t+iI4VxdvaczgQuCHRjFIbXHsHwEPtApqc5HezwuL2E6gNJfSUEpm2+oawwkf5QFscJDLk0f6OumrS7OnGBar3ThW6hG1f67GyRz9duNtnhdzOygJ+4vedVper9MiOa0xsmMuGh37YADZgAACGe4z1EEDI7AQAI/wzcaoY4iyZOAfrN1e2536BgiXuYoARplVkl9KMQ22FnKI+oL1m6FDR80JMcTZD7YmHM+8uAzEQ+9kWcTt/drXyDdS8nGkURP5lIuMhC8CrWD1YfTC/cENJMn5Lv2qKVFZRvWgQAQS4/+u7K+iWkESI5c9OUiJoXBS7a2FLbVLDFCKFu75QvMbPMevC+4D9EfFgCZ19bXjhEyTly1Jem4xjuhb+GAcUQa0LPOlxHE6A9QWc7qeAHNs9d3ZtCFWi5BNDoKyuycaOQB5GLvvMrZzhFhJu4WSj9lQIEvo26keZFXzcAnc9B7iaAFRrd430+9Lq4Jxg8arT6lLMD0gdTvJReqbAZpcV0c5cGxo/bJf2u6D6rWydxxGw8JJxW6aYZHx7MlFZKkZ2ugPiEY+EKHJYnTmj944uGFQQKh3CpNPiRvb53cPcrqWZ+FdWAOybTGf6hzBigl8WqCSxB74ceYLS5zgfODuRsBFri1RaEkh7eAIAjY8vR5uZ8RCr1fT4Cra6DMprQlzVPwPjqOooHNCxCYNhvJhjXSo0YOwnmsg5APo9jtofpljIndkOYd1aZyj2NByX80SqisFzoP66rGgjzu/wa1KWfSGwyatrkCqXyuQ8AQwuwvkA9Pdxk0lkbGKP1tGmaO7zz3RwKlH52bkDOhCNXZwN6vfTLG0A3jhaCcFPb4qOFihh1zTIwln2NIJR4rc0H+Z3ubSweuuaGeWe3PzV+vLZT/WaPooMknnpw8lTMhn/4FA83TD/N7IJx/Ag=="
+              },
+              "responseProperty": "dialog.postResponse"
+            },
+            {
+              "$type": "Microsoft.SendActivity",
+              "activity": "Here is your latest email subject: {dialog.postResponse.value[0].subject}"
+            },
+            {
+              "$type": "Microsoft.SendActivity",
+              "activity": "which is from: {dialog.postResponse.value[0].sender.emailAddress.address}"
+            }
+          ]
+        }
+    ]
+}
