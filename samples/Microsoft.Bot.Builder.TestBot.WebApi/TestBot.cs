@@ -7,7 +7,7 @@ using Microsoft.Bot.Schema;
 
 namespace Microsoft.Bot.Builder.TestBot.WebApi
 {
-    public class TestBot : IBot
+    public class TestBot : IBot2
     {
         public async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default(CancellationToken))
         {

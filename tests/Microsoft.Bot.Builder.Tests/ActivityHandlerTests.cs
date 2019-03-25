@@ -26,7 +26,7 @@ namespace Microsoft.Bot.Builder.Tests
 
             // Act
             var bot = new TestActivityHandler();
-            await ((IBot)bot).OnTurnAsync(turnContext);
+            await ((IBot2)bot).OnTurnAsync(turnContext);
 
             // Assert
             Assert.AreEqual(1, bot.Record.Count);
@@ -50,7 +50,7 @@ namespace Microsoft.Bot.Builder.Tests
 
             // Act
             var bot = new TestActivityHandler();
-            await ((IBot)bot).OnTurnAsync(turnContext);
+            await ((IBot2)bot).OnTurnAsync(turnContext);
 
             // Assert
             Assert.AreEqual(1, bot.Record.Count);
@@ -75,7 +75,7 @@ namespace Microsoft.Bot.Builder.Tests
 
             // Act
             var bot = new TestActivityHandler();
-            await ((IBot)bot).OnTurnAsync(turnContext);
+            await ((IBot2)bot).OnTurnAsync(turnContext);
 
             // Assert
             Assert.AreEqual(2, bot.Record.Count);
@@ -102,7 +102,7 @@ namespace Microsoft.Bot.Builder.Tests
 
             // Act
             var bot = new TestActivityHandler();
-            await ((IBot)bot).OnTurnAsync(turnContext);
+            await ((IBot2)bot).OnTurnAsync(turnContext);
 
             // Assert
             Assert.AreEqual(2, bot.Record.Count);
@@ -127,7 +127,7 @@ namespace Microsoft.Bot.Builder.Tests
 
             // Act
             var bot = new TestActivityHandler();
-            await ((IBot)bot).OnTurnAsync(turnContext);
+            await ((IBot2)bot).OnTurnAsync(turnContext);
 
             // Assert
             Assert.AreEqual(1, bot.Record.Count);
@@ -152,7 +152,7 @@ namespace Microsoft.Bot.Builder.Tests
 
             // Act
             var bot = new TestActivityHandler();
-            await ((IBot)bot).OnTurnAsync(turnContext);
+            await ((IBot2)bot).OnTurnAsync(turnContext);
 
             // Assert
             Assert.AreEqual(2, bot.Record.Count);
@@ -179,7 +179,7 @@ namespace Microsoft.Bot.Builder.Tests
 
             // Act
             var bot = new TestActivityHandler();
-            await ((IBot)bot).OnTurnAsync(turnContext);
+            await ((IBot2)bot).OnTurnAsync(turnContext);
 
             // Assert
             Assert.AreEqual(2, bot.Record.Count);
@@ -204,7 +204,7 @@ namespace Microsoft.Bot.Builder.Tests
 
             // Act
             var bot = new TestActivityHandler();
-            await ((IBot)bot).OnTurnAsync(turnContext);
+            await ((IBot2)bot).OnTurnAsync(turnContext);
 
             // Assert
             Assert.AreEqual(1, bot.Record.Count);
@@ -228,7 +228,7 @@ namespace Microsoft.Bot.Builder.Tests
 
             // Act
             var bot = new TestActivityHandler();
-            await ((IBot)bot).OnTurnAsync(turnContext);
+            await ((IBot2)bot).OnTurnAsync(turnContext);
 
             // Assert
             Assert.AreEqual(1, bot.Record.Count);
@@ -248,7 +248,7 @@ namespace Microsoft.Bot.Builder.Tests
 
             // Act
             var bot = new TestActivityHandler();
-            await ((IBot)bot).OnTurnAsync(turnContext);
+            await ((IBot2)bot).OnTurnAsync(turnContext);
 
             // Assert
             Assert.AreEqual(2, bot.Record.Count);
@@ -269,7 +269,7 @@ namespace Microsoft.Bot.Builder.Tests
 
             // Act
             var bot = new TestActivityHandler();
-            await ((IBot)bot).OnTurnAsync(turnContext);
+            await ((IBot2)bot).OnTurnAsync(turnContext);
 
             // Assert
             Assert.AreEqual(2, bot.Record.Count);
@@ -289,7 +289,7 @@ namespace Microsoft.Bot.Builder.Tests
 
             // Act
             var bot = new TestActivityHandler();
-            await ((IBot)bot).OnTurnAsync(turnContext);
+            await ((IBot2)bot).OnTurnAsync(turnContext);
 
             // Assert
             Assert.AreEqual(2, bot.Record.Count);
@@ -309,7 +309,7 @@ namespace Microsoft.Bot.Builder.Tests
 
             // Act
             var bot = new TestActivityHandler();
-            await ((IBot)bot).OnTurnAsync(turnContext);
+            await ((IBot2)bot).OnTurnAsync(turnContext);
 
             // Assert
             Assert.AreEqual(1, bot.Record.Count);

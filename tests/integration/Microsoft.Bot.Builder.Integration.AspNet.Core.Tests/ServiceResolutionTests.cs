@@ -80,14 +80,14 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core.Tests
 
                 var serviceProvider = serviceCollection.BuildServiceProvider();
 
-                var bot = serviceProvider.GetService<IBot>();
+                var bot = serviceProvider.GetService<IBot2>();
 
                 bot.Should().NotBeNull()
                     .And.BeOfType<ServiceResolutionTestBot>();
             }
         }
 
-        public sealed class ServiceResolutionTestBot : IBot
+        public sealed class ServiceResolutionTestBot : IBot2
         {
             public Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken)
             {

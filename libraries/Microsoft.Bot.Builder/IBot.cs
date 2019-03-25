@@ -12,7 +12,7 @@ namespace Microsoft.Bot.Builder
     /// <remarks>A <see cref="BotAdapter"/> passes incoming activities from the user's
     /// channel to the bot's <see cref="OnTurnAsync(ITurnContext, CancellationToken)"/> method.</remarks>
     /// <seealso cref="IMiddleware"/>
-    public interface IBot
+    public interface IBot2
     {
         /// <summary>
         /// When implemented in a bot, handles an incoming activity.

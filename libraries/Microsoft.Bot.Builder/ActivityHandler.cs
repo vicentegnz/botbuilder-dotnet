@@ -17,7 +17,7 @@ namespace Microsoft.Bot.Builder
     /// Pre and post processing of Activities can be plugged in by deriving and calling
     /// the base class implementation.
     /// </summary>
-    public class ActivityHandler : IBot
+    public class ActivityHandler : IBot2
     {
         /// <summary>
         /// The OnTurnAsync function is called by the Adapter (for example, the <see cref="BotFrameworkAdapter"/>)

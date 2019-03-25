@@ -224,7 +224,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core.Tests
                 {
                     VerifyStandardBotServicesAreRegistered(serviceCollectionMock);
 
-                    serviceCollectionMock.Verify(sc => sc.Add(It.Is<ServiceDescriptor>(sd => sd.ServiceType == typeof(IBot) && sd.ImplementationType == typeof(ServiceRegistrationTestBot) && sd.Lifetime == ServiceLifetime.Transient)));
+                    serviceCollectionMock.Verify(sc => sc.Add(It.Is<ServiceDescriptor>(sd => sd.ServiceType == typeof(IBot2) && sd.ImplementationType == typeof(ServiceRegistrationTestBot) && sd.Lifetime == ServiceLifetime.Transient)));
                 }
             }
 
@@ -245,7 +245,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core.Tests
                 {
                     var serviceCollectionMock = CreateServiceCollectionMock();
 
-                    var action = new Action(() => serviceCollectionMock.Object.AddBot((Func<IServiceProvider, IBot>)null));
+                    var action = new Action(() => serviceCollectionMock.Object.AddBot((Func<IServiceProvider, IBot2>)null));
 
                     action.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("botFactory");
                 }
@@ -309,7 +309,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core.Tests
                 {
                     VerifyStandardBotServicesAreRegistered(serviceCollectionMock);
 
-                    serviceCollectionMock.Verify(sc => sc.Add(It.Is<ServiceDescriptor>(sd => sd.ServiceType == typeof(IBot) && sd.ImplementationFactory != null && sd.Lifetime == ServiceLifetime.Transient)));
+                    serviceCollectionMock.Verify(sc => sc.Add(It.Is<ServiceDescriptor>(sd => sd.ServiceType == typeof(IBot2) && sd.ImplementationFactory != null && sd.Lifetime == ServiceLifetime.Transient)));
                 }
             }
 
@@ -330,7 +330,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core.Tests
                 {
                     var serviceCollectionMock = new Mock<IServiceCollection>();
 
-                    var action = new Action(() => serviceCollectionMock.Object.AddBot((IBot)null));
+                    var action = new Action(() => serviceCollectionMock.Object.AddBot((IBot2)null));
 
                     action.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("bot");
                 }
@@ -340,7 +340,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core.Tests
                 {
                     var serviceCollectionMock = CreateServiceCollectionMock();
 
-                    var botInstance = Mock.Of<IBot>();
+                    var botInstance = Mock.Of<IBot2>();
 
                     serviceCollectionMock.Object.AddBot(botInstance);
 
@@ -352,7 +352,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core.Tests
                 {
                     var serviceCollectionMock = CreateServiceCollectionMock();
 
-                    var botInstance = Mock.Of<IBot>();
+                    var botInstance = Mock.Of<IBot2>();
 
                     serviceCollectionMock.Object.AddBot(botInstance, (Action<BotFrameworkOptions>)null);
 
@@ -364,7 +364,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core.Tests
                 {
                     var serviceCollectionMock = CreateServiceCollectionMock();
 
-                    var botInstance = Mock.Of<IBot>();
+                    var botInstance = Mock.Of<IBot2>();
 
                     serviceCollectionMock.Object.AddBot(
                         botInstance,
@@ -394,7 +394,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core.Tests
                 {
                     VerifyStandardBotServicesAreRegistered(serviceCollectionMock);
 
-                    serviceCollectionMock.Verify(sc => sc.Add(It.Is<ServiceDescriptor>(sd => sd.ServiceType == typeof(IBot) && sd.ImplementationInstance != null && sd.Lifetime == ServiceLifetime.Singleton)));
+                    serviceCollectionMock.Verify(sc => sc.Add(It.Is<ServiceDescriptor>(sd => sd.ServiceType == typeof(IBot2) && sd.ImplementationInstance != null && sd.Lifetime == ServiceLifetime.Singleton)));
                 }
             }
 
@@ -415,7 +415,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core.Tests
             return serviceCollectionMock;
         }
 
-        public sealed class ServiceRegistrationTestBot : IBot
+        public sealed class ServiceRegistrationTestBot : IBot2
         {
             public Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken)
             {

@@ -14,7 +14,7 @@ using Microsoft.Recognizers.Text;
 
 namespace Microsoft.Bot.Builder.TestBot.Json
 {
-    public class TestBot : IBot
+    public class TestBot : IBot2
     {
         private DialogSet _dialogs;
 

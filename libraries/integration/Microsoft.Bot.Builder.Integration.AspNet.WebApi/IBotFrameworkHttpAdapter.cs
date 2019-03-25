@@ -22,6 +22,6 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.WebApi
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
-        Task ProcessAsync(HttpRequestMessage httpRequest, HttpResponseMessage httpResponse, IBot bot, CancellationToken cancellationToken = default(CancellationToken));
+        Task ProcessAsync(HttpRequestMessage httpRequest, HttpResponseMessage httpResponse, IBot2 bot, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

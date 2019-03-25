@@ -20,7 +20,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.WebApi
         {
         }
 
-        public async Task ProcessAsync(HttpRequestMessage httpRequest, HttpResponseMessage httpResponse, IBot bot, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task ProcessAsync(HttpRequestMessage httpRequest, HttpResponseMessage httpResponse, IBot2 bot, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (httpRequest == null)
             {

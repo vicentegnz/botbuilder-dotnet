@@ -9,7 +9,7 @@ namespace Microsoft.Bot.Builder
     /// <summary>
     /// Encapsulates an asynchronous method that calls the next
     /// <see cref="IMiddleware"/>.<see cref="IMiddleware.OnTurnAsync"/>
-    /// or <see cref="IBot"/>.<see cref="IBot.OnTurnAsync"/> method in the middleware pipeline.
+    /// or <see cref="IBot2"/>.<see cref="IBot2.OnTurnAsync"/> method in the middleware pipeline.
     /// </summary>
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
@@ -30,7 +30,7 @@ namespace Microsoft.Bot.Builder
     /// <para>For each activity, the adapter calls middleware in the order in which you
     /// added it.</para>
     /// </remarks>
-    /// <seealso cref="IBot"/>
+    /// <seealso cref="IBot2"/>
     public interface IMiddleware
     {
         /// <summary>

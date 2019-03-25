@@ -16,7 +16,7 @@ namespace Microsoft.Bot.Builder
     /// <remarks>Context provides information needed to process an incoming activity.
     /// The context object is created by a <see cref="BotAdapter"/> and persists for the
     /// length of the turn.</remarks>
-    /// <seealso cref="IBot"/>
+    /// <seealso cref="IBot2"/>
     /// <seealso cref="IMiddleware"/>
     public class TurnContext : ITurnContext, IDisposable
     {

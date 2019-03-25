@@ -66,7 +66,7 @@ namespace Microsoft.Bot.Builder.TestBot
                 ConversationState = conversationState
             };
 
-            services.AddBot<IBot>(
+            services.AddBot<IBot2>(
                 (IServiceProvider sp) =>
                 {
                     return new TestBot(accessors);

@@ -60,7 +60,7 @@ namespace Microsoft.Bot.Builder.Adapters
         /// </summary>
         /// <param name="adapter">The test adapter to use.</param>
         /// <param name="bot">The bot containing the turn processing logic to test.</param>
-        public TestFlow(TestAdapter adapter, IBot bot)
+        public TestFlow(TestAdapter adapter, IBot2 bot)
             : this(adapter, bot.OnTurnAsync)
         {
         }

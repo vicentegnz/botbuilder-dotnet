@@ -25,7 +25,7 @@ namespace Microsoft.Bot.Builder
     /// </remarks>
     /// <seealso cref="ITurnContext"/>
     /// <seealso cref="IActivity"/>
-    /// <seealso cref="IBot"/>
+    /// <seealso cref="IBot2"/>
     /// <seealso cref="IMiddleware"/>
     public abstract class BotAdapter
     {
@@ -151,7 +151,7 @@ namespace Microsoft.Bot.Builder
         /// methods or the callback method, and the pipeline short circuits.
         /// <para>When the turn is initiated by a user activity (reactive messaging), the
         /// callback method will be a reference to the bot's
-        /// <see cref="IBot.OnTurnAsync(ITurnContext, CancellationToken)"/> method. When the turn is
+        /// <see cref="IBot2.OnTurnAsync(ITurnContext, CancellationToken)"/> method. When the turn is
         /// initiated by a call to <see cref="ContinueConversationAsync(string, ConversationReference, BotCallbackHandler, CancellationToken)"/>
         /// (proactive messaging), the callback method is the callback method that was provided in the call.</para>
         /// </remarks>

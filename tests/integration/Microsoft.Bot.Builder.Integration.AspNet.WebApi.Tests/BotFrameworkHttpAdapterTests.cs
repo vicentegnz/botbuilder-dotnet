@@ -26,7 +26,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.WebApi.Tests
 
             var httpResponse = new HttpResponseMessage();
 
-            var botMock = new Mock<IBot>();
+            var botMock = new Mock<IBot2>();
             botMock.Setup(b => b.OnTurnAsync(It.IsAny<TurnContext>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
             // Act
@@ -74,7 +74,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.WebApi.Tests
             return new StringContent(json, Encoding.UTF8, "application/json");
         }
 
-        private class InvokeResponseBot : IBot
+        private class InvokeResponseBot : IBot2
         {
             public async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default(CancellationToken))
             {

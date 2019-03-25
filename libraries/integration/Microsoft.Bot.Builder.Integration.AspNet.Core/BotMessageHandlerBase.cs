@@ -51,7 +51,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core.Handlers
 
             var requestServices = httpContext.RequestServices;
             var adapter = requestServices.GetRequiredService<IAdapterIntegration>();
-            var bot = requestServices.GetRequiredService<IBot>();
+            var bot = requestServices.GetRequiredService<IBot2>();
 
             try
             {

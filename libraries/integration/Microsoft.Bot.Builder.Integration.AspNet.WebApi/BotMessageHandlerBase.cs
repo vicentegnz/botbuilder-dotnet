@@ -65,20 +65,20 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.WebApi.Handlers
                     {
                         cancellationToken.ThrowIfCancellationRequested();
 
-                        IBot bot;
+                        IBot2 bot;
 
                         try
                         {
-                            bot = (IBot)request.GetDependencyScope()?.GetService(typeof(IBot));
+                            bot = (IBot2)request.GetDependencyScope()?.GetService(typeof(IBot2));
                         }
                         catch (Exception exception)
                         {
-                            throw new Exception($"An exception occurred attempting to resolve an {typeof(IBot).Name} service via the dependency resolver. Please check the inner exception for more details.", exception);
+                            throw new Exception($"An exception occurred attempting to resolve an {typeof(IBot2).Name} service via the dependency resolver. Please check the inner exception for more details.", exception);
                         }
 
                         if (bot == null)
                         {
-                            throw new InvalidOperationException($"Did not find an {typeof(IBot).Name} service via the dependency resolver. Please make sure you have registered your bot with your dependency injection container.");
+                            throw new InvalidOperationException($"Did not find an {typeof(IBot2).Name} service via the dependency resolver. Please make sure you have registered your bot with your dependency injection container.");
                         }
 
                         return bot.OnTurnAsync(context);

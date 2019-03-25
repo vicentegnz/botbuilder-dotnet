@@ -66,7 +66,7 @@ namespace Microsoft.Bot.Builder.TestBot.WebApi
 
             container.RegisterInstance<IAdapterIntegration>(adapter);
 
-            container.RegisterType<IBot, TestBot>();
+            container.RegisterType<IBot2, TestBot>();
         }
     }
 }

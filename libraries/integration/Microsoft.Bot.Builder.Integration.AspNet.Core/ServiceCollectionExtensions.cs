@@ -14,22 +14,22 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
     /// </summary>
     /// <seealso cref="ApplicationBuilderExtensions"/>
     /// <seealso cref="IAdapterIntegration"/>
-    /// <seealso cref="IBot"/>
+    /// <seealso cref="IBot2"/>
     public static class ServiceCollectionExtensions
     {
         /// <summary>
         /// Adds and optionally configures a <typeparamref name="TBot">specified bot type</typeparamref> to the <see cref="IServiceCollection" />.
         /// </summary>
-        /// <typeparam name="TBot">A concrete type of <see cref="IBot"/> that is to be registered and exposed to the Bot Framework.</typeparam>
+        /// <typeparam name="TBot">A concrete type of <see cref="IBot2"/> that is to be registered and exposed to the Bot Framework.</typeparam>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <param name="configureAction">A optional callback that, if provided, will be invoked to further configure of the bot.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <remarks>
         ///     The <typeparamref name="TBot"/> will be registered as <see cref="ServiceLifetime.Transient">transient</see> and be instantiated on each turn.
         /// </remarks>
-        /// <seealso cref="IBot"/>
+        /// <seealso cref="IBot2"/>
         public static IServiceCollection AddBot<TBot>(this IServiceCollection services, Action<BotFrameworkOptions> configureAction = null)
-            where TBot : class, IBot
+            where TBot : class, IBot2
         {
             if (services == null)
             {
@@ -43,20 +43,20 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
 
             return services
                 .TryAddBotFrameworkAdapterIntegration()
-                .AddTransient<IBot, TBot>();
+                .AddTransient<IBot2, TBot>();
         }
 
         /// <summary>
         /// Adds and optionally configures a singleton <paramref name="bot">bot</paramref> instance to the <see cref="IServiceCollection"/>.
         /// </summary>
-        /// <typeparam name="TBot">A concrete type of <see cref="IBot"/> that is to be registered and exposed to the Bot Framework.</typeparam>
+        /// <typeparam name="TBot">A concrete type of <see cref="IBot2"/> that is to be registered and exposed to the Bot Framework.</typeparam>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <param name="bot">The instance of the bot that will be registered as a <see cref="ServiceLifetime.Singleton"/>.</param>
         /// <param name="configureAction">A optional callback that, if provided, will be invoked to further configure of the bot.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <seealso cref="IBot"/>
+        /// <seealso cref="IBot2"/>
         public static IServiceCollection AddBot<TBot>(this IServiceCollection services, TBot bot, Action<BotFrameworkOptions> configureAction = null)
-        where TBot : class, IBot
+        where TBot : class, IBot2
         {
             if (services == null)
             {
@@ -75,13 +75,13 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
 
             return services
                 .TryAddBotFrameworkAdapterIntegration()
-                .AddSingleton<IBot>(bot);
+                .AddSingleton<IBot2>(bot);
         }
 
         /// <summary>
         /// Adds and optionally configures a <typeparamref name="TBot">specified bot type</typeparamref> to the <see cref="IServiceCollection" />.
         /// </summary>
-        /// <typeparam name="TBot">A concrete type of <see cref="IBot"/> that is to be registered and exposed to the Bot Framework.</typeparam>
+        /// <typeparam name="TBot">A concrete type of <see cref="IBot2"/> that is to be registered and exposed to the Bot Framework.</typeparam>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <param name="botFactory">A factory method that will supply an instance of the <typeparamref name="TBot"/> when invoked.</param>
         /// <param name="configureAction">A optional callback that, if provided, will be invoked to further configure of the bot.</param>
@@ -90,9 +90,9 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
         ///     The <paramref name="botFactory">factory</paramref> will be registered as <see cref="ServiceLifetime.Transient">transient</see>
         ///     and be invoked on each turn.
         /// </remarks>
-        /// <seealso cref="IBot"/>
+        /// <seealso cref="IBot2"/>
         public static IServiceCollection AddBot<TBot>(this IServiceCollection services, Func<IServiceProvider, TBot> botFactory, Action<BotFrameworkOptions> configureAction = null)
-            where TBot : class, IBot
+            where TBot : class, IBot2
         {
             if (services == null)
             {
@@ -111,7 +111,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
 
             return services
                 .TryAddBotFrameworkAdapterIntegration()
-                .AddSingleton<IBot>(botFactory);
+                .AddSingleton<IBot2>(botFactory);
         }
 
         /// <summary>

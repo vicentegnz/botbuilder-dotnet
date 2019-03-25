@@ -39,7 +39,7 @@ namespace Microsoft.Bot.Builder
     /// </remarks>
     /// <seealso cref="ITurnContext"/>
     /// <seealso cref="IActivity"/>
-    /// <seealso cref="IBot"/>
+    /// <seealso cref="IBot2"/>
     /// <seealso cref="IMiddleware"/>
     public class BotFrameworkAdapter : BotAdapter, IAdapterIntegration, IUserTokenProvider
     {

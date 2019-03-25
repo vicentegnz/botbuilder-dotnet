@@ -28,7 +28,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core.Tests
 
             var httpResponseMock = new Mock<HttpResponse>();
 
-            var botMock = new Mock<IBot>();
+            var botMock = new Mock<IBot2>();
             botMock.Setup(b => b.OnTurnAsync(It.IsAny<TurnContext>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
             // Act
@@ -91,7 +91,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core.Tests
             return stream;
         }
 
-        private class InvokeResponseBot : IBot
+        private class InvokeResponseBot : IBot2
         {
             public async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default(CancellationToken))
             {

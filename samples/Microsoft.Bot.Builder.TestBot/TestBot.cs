@@ -10,7 +10,7 @@ using Microsoft.Recognizers.Text;
 
 namespace Microsoft.Bot.Builder.TestBot
 {
-    public class TestBot : IBot
+    public class TestBot : IBot2
     {
         private DialogSet _dialogs;
         private SemaphoreSlim _semaphore;

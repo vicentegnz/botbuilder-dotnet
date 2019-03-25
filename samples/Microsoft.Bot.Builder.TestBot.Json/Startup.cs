@@ -57,7 +57,7 @@ namespace Microsoft.Bot.Builder.TestBot.Json
                 // add current folder, it's project file, packages, projects, etc.
                 .AddProjectResources(HostingEnvironment.ContentRootPath);
 
-            services.AddBot<IBot>(
+            services.AddBot<IBot2>(
                 (IServiceProvider sp) =>
                 {
                     // declarative Adaptive dialogs bot sample

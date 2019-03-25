@@ -14,9 +14,9 @@ namespace Microsoft.Bot.Builder
         /// Initializes a new instance of the <see cref="UserState"/> class.
         /// </summary>
         /// <param name="storage">The storage provider to use.</param>
-        public UserState(IStorage storage)
+        public UserState(IStorage storage, string thisShouldBreak = "This is a Compat Break")
             : base(storage, nameof(UserState))
-        {
+        {            
         }
 
         /// <summary>

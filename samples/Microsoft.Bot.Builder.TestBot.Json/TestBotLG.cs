@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace Microsoft.Bot.Builder.TestBot.Json
 {
-    public class TestBotLG : IBot
+    public class TestBotLG : IBot2
     {
         private readonly TemplateEngine engine;
 
