@@ -42,7 +42,7 @@ namespace Microsoft.Bot.Protocol
                 return response;
             }
 
-            if (request.Streams[0].Type != "application/json")
+            if (request.Streams[0].Type != "application/json; charset=utf-8")
             {
                 response.StatusCode = 406;
                 return response;
