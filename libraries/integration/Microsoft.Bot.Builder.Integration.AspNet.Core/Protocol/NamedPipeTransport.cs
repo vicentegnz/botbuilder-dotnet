@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipes;
-using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Bot.Protocol.Transport;
 
-namespace Microsoft.Bot.Streaming.Transport
+namespace Microsoft.Bot.Protocol
 {
-    public class NamedPipeTransport : ITransportWriter, ITransportReader
+    public class NamedPipeTransport : ITransportSender, ITransportReceiver
     {
         public const string ServerIncomingPath = ".incoming";
         public const string ServerOutgoingPath = ".outgoing";
@@ -31,7 +30,7 @@ namespace Microsoft.Bot.Streaming.Transport
             _stream.Dispose();
         }
 
-        public async Task<int> ReadAsync(byte[] buffer, int offset, int count)
+        public async Task<int> ReceiveAsync(byte[] buffer, int offset, int count)
         {
             try
             {
@@ -49,7 +48,7 @@ namespace Microsoft.Bot.Streaming.Transport
             return 0;
         }
 
-        public async Task<int> WriteAsync(byte[] buffer, int offset, int count)
+        public async Task<int> SendAsync(byte[] buffer, int offset, int count)
         {
             try
             {

@@ -8,9 +8,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder;
+using Microsoft.Bot.Protocol;
 using Microsoft.Bot.Schema;
-using Microsoft.Bot.Streaming;
-using Microsoft.Bot.Streaming.Protocol;
 using Newtonsoft.Json;
 
 namespace Microsoft.Bot.Builder.Integration.AspNet.Core
@@ -149,14 +148,14 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
                     var conversationId = activity.Conversation.Id;
                     var activityId = activity.ReplyToId;
 
-                    var requestVerb = "POST";
                     var baseUrl = activity.ServiceUrl + (activity.ServiceUrl.EndsWith("/") ? "" : "/");
                     var requestPath = $"{baseUrl}v3/conversations/{conversationId}/activities/{activityId}";
 
                     var requestContent = JsonConvert.SerializeObject(activity, SerializationSettings.BotSchemaSerializationSettings);
                     var stringContent = new StringContent(requestContent, Encoding.UTF8, "application/json");
 
-                    var socketResponse = await _server.SendAsync(requestVerb, requestPath, null, stringContent).ConfigureAwait(false);
+                    var request = Request.CreatePost(requestPath, stringContent);
+                    var socketResponse = await _server.SendAsync(request).ConfigureAwait(false);
 
                     response = socketResponse.ReadBodyAsJson<ResourceResponse>();
                 }
@@ -164,14 +163,14 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
                 {
                     var conversationId = activity.Conversation.Id;
 
-                    var requestVerb = "POST";
                     var baseUrl = activity.ServiceUrl + (activity.ServiceUrl.EndsWith("/") ? "" : "/");
                     var requestPath = $"{baseUrl}v3/conversations/{conversationId}/activities";
+
                     var requestContent = JsonConvert.SerializeObject(activity, SerializationSettings.BotSchemaSerializationSettings);
                     var stringContent = new StringContent(requestContent, Encoding.UTF8, "application/json");
 
-                    // use a SocketClient to send this request and await a response
-                    var socketResponse = await _server.SendAsync(requestVerb, requestPath, null, stringContent).ConfigureAwait(false);
+                    var request = Request.CreatePost(requestPath, stringContent);
+                    var socketResponse = await _server.SendAsync(request).ConfigureAwait(false);
 
                     response = socketResponse.ReadBodyAsJson<ResourceResponse>();
                 }

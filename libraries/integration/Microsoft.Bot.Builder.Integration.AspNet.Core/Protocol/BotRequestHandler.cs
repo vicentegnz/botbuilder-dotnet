@@ -7,10 +7,9 @@ using System.Threading.Tasks;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Schema;
-using Microsoft.Bot.Streaming.Protocol;
 using Newtonsoft.Json;
 
-namespace Microsoft.Bot.Streaming
+namespace Microsoft.Bot.Protocol
 {
     internal class BotRequestHandler : RequestHandler
     {
@@ -28,26 +27,22 @@ namespace Microsoft.Bot.Streaming
         {
             var response = new Response();
 
-            if (string.IsNullOrEmpty(request.Method) || request.Method.ToUpperInvariant() != "POST")
+            if (string.IsNullOrEmpty(request.Verb) || request.Verb.ToUpperInvariant() != "POST")
             {
                 response.StatusCode = 405;
                 return response;
             }
 
-            var body = request.ReadBodyAsString();
+            var body = await request.ReadBodyAsString().ConfigureAwait(false);
 
-            if (string.IsNullOrEmpty(body) || request.ContentFeeds == null || request.ContentFeeds.Count == 0)
+            if (string.IsNullOrEmpty(body) || request.Streams == null || request.Streams.Count == 0)
             {
                 // no body
                 response.StatusCode = 400;
                 return response;
             }
 
-            var contentHeaders = request.ContentFeeds[0].Headers;
-
-            string contentType;
-            MediaTypeHeaderValue mediaTypeHeaderValue;
-            if (!contentHeaders.TryGetValue("Content-Type", out contentType) || !MediaTypeHeaderValue.TryParse(contentType, out mediaTypeHeaderValue) || mediaTypeHeaderValue.MediaType != "application/json")
+            if (request.Streams[0].Type != "application/json")
             {
                 response.StatusCode = 406;
                 return response;
@@ -56,11 +51,7 @@ namespace Microsoft.Bot.Streaming
             var activity = JsonConvert.DeserializeObject<Activity>(body, SerializationSettings.DefaultDeserializationSettings);
             try
             {
-                var token = (string)null;
-                if (request.Headers != null)
-                {
-                    request.Headers.TryGetValue("Authorization", out token);
-                }
+                string token = null;
 
                 var invokeResponse = await this.Adapter.ProcessActivityAsync(token, activity, new BotCallbackHandler(this.Bot.OnTurnAsync), CancellationToken.None).ConfigureAwait(false);
                 if (invokeResponse == null)

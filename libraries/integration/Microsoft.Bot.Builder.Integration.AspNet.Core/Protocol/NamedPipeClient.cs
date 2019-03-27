@@ -1,17 +1,26 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
 using System.IO.Pipes;
+using System.Linq;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Bot.Streaming.Protocol;
-using Microsoft.Bot.Streaming.Protocol.Managers;
-using Microsoft.Bot.Streaming.Transport;
+using Microsoft.Bot.Protocol;
+using Microsoft.Bot.Protocol.Payloads;
+using Microsoft.Bot.Protocol.PayloadTransport;
+using Microsoft.Bot.Protocol.Utilities;
+using Newtonsoft.Json;
 
-namespace Microsoft.Bot.Streaming
+namespace Microsoft.Bot.Protocol
 {
     public class NamedPipeClient
     {
         private readonly string _baseName;
         private readonly RequestHandler _requestHandler;
-        private readonly PacketManager _connection;
+        private readonly IPayloadSender _sender;
+        private readonly IPayloadReceiver _receiver;
         private readonly RequestManager _requestManager;
         private readonly ProtocolAdapter _protocolAdapter;
         private readonly bool _autoReconnect;
@@ -22,13 +31,16 @@ namespace Microsoft.Bot.Streaming
             _requestHandler = requestHandler;
             _autoReconnect = autoReconnect;
 
-            _connection = new PacketManager();
             _requestManager = new RequestManager();
-            _protocolAdapter = new ProtocolAdapter(_requestHandler, _connection, _requestManager);
 
-            _connection.Disconnected += OnConnectionDisconnected;
+            _sender = new PayloadSender();
+            _sender.Disconnected += OnConnectionDisconnected;
+            _receiver = new PayloadReceiver();
+            _receiver.Disconnected += OnConnectionDisconnected;
+
+            _protocolAdapter = new ProtocolAdapter(_requestHandler, _requestManager, _sender, _receiver);
         }
-        
+
         public async Task ConnectAsync()
         {
             var outgoingPipeName = _baseName + NamedPipeTransport.ServerIncomingPath;
@@ -39,9 +51,8 @@ namespace Microsoft.Bot.Streaming
             var incoming = new NamedPipeClientStream(".", incomingPipeName, PipeDirection.In, PipeOptions.WriteThrough | PipeOptions.Asynchronous);
             await incoming.ConnectAsync().ConfigureAwait(false);
 
-            _connection.Connect(
-                new NamedPipeTransport(incoming),
-                new NamedPipeTransport(outgoing));
+            _sender.Connect(new NamedPipeTransport(outgoing));
+            _receiver.Connect(new NamedPipeTransport(incoming));
         }
 
         public Task<ReceiveResponse> SendAsync(Request message)
@@ -51,9 +62,10 @@ namespace Microsoft.Bot.Streaming
 
         public void Disconnect()
         {
-            _connection.Disconnect();
+            _sender.Disconnect();
+            _receiver.Disconnect();
         }
-        
+
         private void OnConnectionDisconnected(object sender, EventArgs e)
         {
             if (_autoReconnect)
