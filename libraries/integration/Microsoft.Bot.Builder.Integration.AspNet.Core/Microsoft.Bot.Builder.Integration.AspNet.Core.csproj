@@ -25,6 +25,7 @@
 		<PackageReference Include="AsyncUsageAnalyzers" Version="1.0.0-alpha003" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.0.1" />
 		<PackageReference Include="Microsoft.Bot.Protocol" Version="1.0.0" />
+		<PackageReference Include="Microsoft.Bot.Protocol.NamedPipes" Version="1.0.0" />
 		<PackageReference Include="Microsoft.Bot.Protocol.WebSockets" Version="1.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="2.1.1" />
     <PackageReference Include="Microsoft.Bot.Builder" Condition=" '$(PackageVersion)' == '' " Version="4.0.0-local" />
