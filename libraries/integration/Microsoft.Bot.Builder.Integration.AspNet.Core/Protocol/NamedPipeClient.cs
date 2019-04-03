@@ -24,6 +24,7 @@ namespace Microsoft.Bot.Protocol
         private readonly RequestManager _requestManager;
         private readonly ProtocolAdapter _protocolAdapter;
         private readonly bool _autoReconnect;
+        private bool _isDisconnecting = false;
 
         public NamedPipeClient(string baseName, RequestHandler requestHandler = null, bool autoReconnect = true)
         {
@@ -68,10 +69,32 @@ namespace Microsoft.Bot.Protocol
 
         private void OnConnectionDisconnected(object sender, EventArgs e)
         {
-            if (_autoReconnect)
+            if (!_isDisconnecting)
             {
-                // Try to rerun the client connection 
-                Background.Run(ConnectAsync);
+                _isDisconnecting = true;
+
+                try
+                {
+                    if (_sender.IsConnected)
+                    {
+                        _sender.Disconnect();
+                    }
+
+                    if (_receiver.IsConnected)
+                    {
+                        _receiver.Disconnect();
+                    }
+
+                    if (_autoReconnect)
+                    {
+                        // Try to rerun the client connection 
+                        Background.Run(ConnectAsync);
+                    }
+                }
+                finally
+                {
+                    _isDisconnecting = false;
+                }
             }
         }
     }

@@ -16,6 +16,7 @@ namespace Microsoft.Bot.Protocol
         private readonly IPayloadReceiver _receiver;
         private readonly ProtocolAdapter _protocolAdapter;
         private readonly bool _autoReconnect;
+        private bool _isDisconnecting = false;
 
         public NamedPipeServer(string baseName, RequestHandler requestHandler, bool autoReconnect = true)
         {
@@ -60,10 +61,32 @@ namespace Microsoft.Bot.Protocol
 
         private void OnConnectionDisconnected(object sender, EventArgs e)
         {
-            if (_autoReconnect)
+            if (!_isDisconnecting)
             {
-                // Try to rerun the server connection 
-                Background.Run(StartAsync);
+                _isDisconnecting = true;
+
+                try
+                {
+                    if (_sender.IsConnected)
+                    {
+                        _sender.Disconnect();
+                    }
+
+                    if (_receiver.IsConnected)
+                    {
+                        _receiver.Disconnect();
+                    }
+
+                    if (_autoReconnect)
+                    {
+                        // Try to rerun the server connection 
+                        Background.Run(StartAsync);
+                    }
+                }
+                finally
+                {
+                    _isDisconnecting = false;
+                }
             }
         }
     }
