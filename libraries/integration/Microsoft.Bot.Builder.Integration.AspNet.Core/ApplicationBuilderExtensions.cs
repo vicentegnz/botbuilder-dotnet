@@ -4,6 +4,7 @@
 using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core.Handlers;
+using Microsoft.Bot.Builder.Integration.AspNet.Core.StreamingExtensions;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Extensions.Configuration;
