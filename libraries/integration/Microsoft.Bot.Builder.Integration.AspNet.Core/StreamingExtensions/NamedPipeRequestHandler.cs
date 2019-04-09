@@ -1,25 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Bot.Builder;
-using Microsoft.Bot.Builder.Integration.AspNet.Core;
+using Microsoft.Bot.Protocol;
 using Microsoft.Bot.Schema;
 using Newtonsoft.Json;
 
-namespace Microsoft.Bot.Protocol
+namespace Microsoft.Bot.Builder.Integration.AspNet.Core.StreamingExtensions
 {
-    internal class BotRequestHandler : RequestHandler
+    internal class NamedPipeRequestHandler : RequestHandler
     {
-        public BotRequestHandler(NamedPipeBotAdapter adapter, IBot bot)
+        public NamedPipeRequestHandler(BotFrameworkNamedPipeAdapter adapter, IBot bot)
         {
             this.Adapter = adapter;
             this.Bot = bot;
         }
 
-        private NamedPipeBotAdapter Adapter { get; set; }
+        private BotFrameworkNamedPipeAdapter Adapter { get; set; }
 
         private IBot Bot { get; set; }
 

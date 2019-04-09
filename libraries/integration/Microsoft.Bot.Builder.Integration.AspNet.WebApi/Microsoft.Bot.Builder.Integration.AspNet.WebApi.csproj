@@ -41,6 +41,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="AsyncUsageAnalyzers" Version="1.0.0-alpha003" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Bot.Protocol" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Bot.Protocol.NamedPipes" Version="1.0.0" />
 		<PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.6" />
     <PackageReference Include="Microsoft.Bot.Builder" Condition=" '$(PackageVersion)' == '' " Version="4.0.0-local" />
     <PackageReference Include="Microsoft.Bot.Builder" Condition=" '$(PackageVersion)' != '' " Version="$(PackageVersion)" />

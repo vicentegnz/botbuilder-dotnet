@@ -11,19 +11,27 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Protocol;
 using Microsoft.Bot.Protocol.NamedPipes;
 using Microsoft.Bot.Schema;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 
-namespace Microsoft.Bot.Builder.Integration.AspNet.Core
+namespace Microsoft.Bot.Builder.Integration.AspNet.Core.StreamingExtensions
 {
-    public class NamedPipeBotAdapter : BotAdapter
+    public class BotFrameworkNamedPipeAdapter : BotAdapter, IBotFrameworkStreamingExtensionsAdapter
     {
         private const string InvokeReponseKey = "BotFrameworkAdapter.InvokeResponse";
-
+        private readonly ILogger _logger;
         private NamedPipeServer _server;
+
+        public BotFrameworkNamedPipeAdapter(
+            ILogger logger = null)
+        {
+            _logger = logger ?? NullLogger.Instance;
+        }
 
         public void Initialize(IBot bot)
         {
-            _server = new NamedPipeServer("bfv4.pipes", new BotRequestHandler(this, bot));
+            _server = new NamedPipeServer("bfv4.pipes", new NamedPipeRequestHandler(this, bot));
             Task.Run(() => _server.StartAsync());
         }
 
@@ -149,8 +157,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
                     var conversationId = activity.Conversation.Id;
                     var activityId = activity.ReplyToId;
 
-                    var baseUrl = activity.ServiceUrl + (activity.ServiceUrl.EndsWith("/") ? "" : "/");
-                    var requestPath = $"{baseUrl}v3/conversations/{conversationId}/activities/{activityId}";
+                    var requestPath = $"/v3/conversations/{conversationId}/activities/{activityId}";
 
                     var requestContent = JsonConvert.SerializeObject(activity, SerializationSettings.BotSchemaSerializationSettings);
                     var stringContent = new StringContent(requestContent, Encoding.UTF8, "application/json");
@@ -163,9 +170,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
                 else
                 {
                     var conversationId = activity.Conversation.Id;
-
-                    var baseUrl = activity.ServiceUrl + (activity.ServiceUrl.EndsWith("/") ? "" : "/");
-                    var requestPath = $"{baseUrl}v3/conversations/{conversationId}/activities";
+                    var requestPath = $"/v3/conversations/{conversationId}/activities";
 
                     var requestContent = JsonConvert.SerializeObject(activity, SerializationSettings.BotSchemaSerializationSettings);
                     var stringContent = new StringContent(requestContent, Encoding.UTF8, "application/json");
@@ -204,6 +209,133 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
         public override Task DeleteActivityAsync(ITurnContext turnContext, ConversationReference reference, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<ConversationsResult> GetConversationsAsync(string continuationToken = null, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var route = "/v3/conversations/";
+            var request = Request.CreateGet(route);
+
+            return await SendRequestAsync<ConversationsResult>(request, cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<ConversationResourceResponse> PostConversationAsync(ConversationParameters parameters, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var route = "/v3/conversations/";
+            var request = Request.CreatePost(route);
+            request.SetBody(parameters);
+
+            return await SendRequestAsync<ConversationResourceResponse>(request, cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<ResourceResponse> PostToConversationAsync(string conversationId, Activity activity, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (activity == null)
+            {
+                throw new ArgumentNullException(nameof(activity));
+            }
+
+            var route = string.Format("/v3/conversations/{0}/activities", conversationId);
+            var request = Request.CreatePost(route);
+            request.SetBody(activity);
+
+            return await SendRequestAsync<ResourceResponse>(request, cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<ResourceResponse> PostConversationHistoryAsync(string conversationId, Transcript transcript, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var route = string.Format("/v3/conversations/{0}/activities/history", conversationId);
+            var request = Request.CreatePost(route);
+            request.SetBody(transcript);
+
+            return await SendRequestAsync<ResourceResponse>(request, cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<ResourceResponse> UpdateActivityAsync(string conversationId, string activityId, Activity activity, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (activity == null)
+            {
+                throw new ArgumentNullException(nameof(activity));
+            }
+
+            var route = string.Format("/v3/conversations/{0}/activities/{1}", conversationId, activity.Id);
+            var request = Request.CreatePut(route);
+            request.SetBody(activity);
+
+            return await SendRequestAsync<ResourceResponse>(request, cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<ResourceResponse> PostToActivityAsync(string conversationId, string activityId, Activity activity, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (activity == null)
+            {
+                throw new ArgumentNullException(nameof(activity));
+            }
+
+            var route = string.Format("/v3/conversations/{0}/activities/{1}", conversationId, activity.Id);
+            var request = Request.CreatePost(route);
+            request.SetBody(activity);
+
+            return await SendRequestAsync<ResourceResponse>(request, cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<ResourceResponse> DeleteActivityAsync(string conversationId, string activityId, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var route = string.Format("/v3/conversations/{0}/activities/{1}", conversationId, activityId);
+            var request = Request.CreateDelete(route);
+
+            return await SendRequestAsync<ResourceResponse>(request, cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<IList<ChannelAccount>> GetConversationMembersAsync(string conversationId, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var route = string.Format("/v3/conversations/{0}/members", conversationId);
+            var request = Request.CreateGet(route);
+
+            return await SendRequestAsync<IList<ChannelAccount>>(request, cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<PagedMembersResult> GetConversationPagedMembersAsync(string conversationId, int? pageSize = null, string continuationToken = null, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var route = string.Format("/v3/conversations/{0}/pagedmembers", conversationId);
+            var request = Request.CreateGet(route);
+
+            return await SendRequestAsync<PagedMembersResult>(request, cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<ResourceResponse> DeleteConversationMemberAsync(string conversationId, string memberId, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var route = string.Format("/v3/conversations/{0}/members/{1}", conversationId, memberId);
+            var request = Request.CreateDelete(route);
+
+            return await SendRequestAsync<ResourceResponse>(request, cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<IList<ChannelAccount>> GetActivityMembersAsync(string conversationId, string activityId, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var route = string.Format("/v3/conversations/{0}/activities/{1}/members", conversationId, activityId);
+            var request = Request.CreateGet(route);
+
+            return await SendRequestAsync<IList<ChannelAccount>>(request, cancellationToken).ConfigureAwait(false);
+        }
+
+        private async Task<T> SendRequestAsync<T>(Request request, CancellationToken cancellation = default(CancellationToken))
+        {
+            try
+            {
+                var serverResponse = await _server.SendAsync(request, cancellation).ConfigureAwait(false);
+
+                if (serverResponse.StatusCode == (int)HttpStatusCode.OK)
+                {
+                    return serverResponse.ReadBodyAsJson<T>();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
+
+            return default(T);
         }
     }
 }

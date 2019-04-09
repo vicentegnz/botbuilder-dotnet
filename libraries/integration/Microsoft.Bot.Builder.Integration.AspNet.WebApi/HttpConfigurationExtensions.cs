@@ -4,6 +4,8 @@
 using System;
 using System.Configuration;
 using System.Web.Http;
+using Microsoft.Bot.Builder.Integration.AspNet.Core;
+using Microsoft.Bot.Builder.Integration.AspNet.Core.StreamingExtensions;
 using Microsoft.Bot.Builder.Integration.AspNet.WebApi.Handlers;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Connector.Authentication;
@@ -50,6 +52,13 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.WebApi
             }
 
             ConfigureBotRoutes(httpConfiguration, options, adapter);
+
+            var namedPipeAdapter = httpConfiguration.DependencyResolver.GetService(typeof(BotFrameworkNamedPipeAdapter)) as BotFrameworkNamedPipeAdapter;
+            if (namedPipeAdapter != null)
+            {
+                var bot = httpConfiguration.DependencyResolver.GetService(typeof(IBot)) as IBot;
+                namedPipeAdapter.Initialize(bot);
+            }
 
             ConfigureCustomEndpoints();
 

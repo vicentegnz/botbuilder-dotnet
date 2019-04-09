@@ -89,7 +89,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
             var options = applicationServices.GetRequiredService<IOptions<BotFrameworkOptions>>().Value;
 
             var bot = applicationServices.GetRequiredService<IBot>();
-            var adapter = applicationServices.GetRequiredService<NamedPipeBotAdapter>();
+            var adapter = applicationServices.GetRequiredService<BotFrameworkNamedPipeAdapter>();
             adapter.Initialize(bot);
 
             return applicationBuilder;

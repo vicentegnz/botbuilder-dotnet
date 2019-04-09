@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using Microsoft.Bot.Builder.Integration.AspNet.Core.StreamingExtensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -191,7 +192,7 @@ namespace Microsoft.Bot.Builder.Integration.AspNet.Core
                 throw new ArgumentNullException(nameof(services));
             }
 
-            var adapter = new NamedPipeBotAdapter();
+            var adapter = new BotFrameworkNamedPipeAdapter();
 
             services.AddSingleton(adapter);
 
