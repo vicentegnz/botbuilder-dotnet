@@ -83,7 +83,7 @@ namespace CafeBotAdaptive
                     {
                         new BeginDialog(whoAreYouDialogName)
                     }),
-                    new NoneIntentRule(
+                    new UnknownIntentRule(
                     steps: new List<IDialog>()
                     {
                         new SendActivity("Sorry, I do not understand that. Try saying 'who are you' or 'what can you do")
@@ -94,27 +94,43 @@ namespace CafeBotAdaptive
             var whoAreYouDialog = new AdaptiveDialog(whoAreYouDialogName)
             {
                 Recognizer = new LuisRecognizer(new LuisApplication("dabb5f49-d641-4260-a5ef-81249c359339", "a95d07785b374f0a9d7d40700e28a285", "https://westus.api.cognitive.microsoft.com")),
-                Rules = new List<IRule>()
+                Steps = new List<IDialog>()
                 {
-                    new BeginDialogRule(
-                        steps: new List<IDialog>()
+                    new IfCondition()
+                    {
+                        Condition = new ExpressionEngine().Parse("@userName != null"),
+                        Steps = new List<IDialog>()
                         {
-                            // TODO: catch name change when this dialog is called. This is to handle cases where the user said 'my name is <user name>'
+                            new SaveEntity("user.name", "@userName")
+                        },
+                        ElseSteps = new List<IDialog>()
+                        {
                             new IfCondition()
                             {
-                                Condition = new ExpressionEngine().Parse("user.name == null"),
-                                Steps = new List<IDialog> ()
+                                Condition = new ExpressionEngine().Parse("@userName_patternAny != null"), 
+                                Steps = new List<IDialog>()
                                 {
-                                    new SendActivity("Hello, I'm the cafe bot! What is your name?"),
-                                    new EndTurn()
-                                },
-                                ElseSteps = new List<IDialog> ()
-                                {
-                                    new SendActivity("Hello {user.name}, nice to see you again! How can I be of help today?")
+                                    new SaveEntity("user.name", "@userName_patternAny")
                                 }
                             }
                         }
-                    ),
+                    },
+                    new IfCondition()
+                    {
+                        Condition = new ExpressionEngine().Parse("user.name == null"),
+                        Steps = new List<IDialog> ()
+                        {
+                            new SendActivity("Hello, I'm the cafe bot! What is your name?"),
+                            new EndTurn()
+                        },
+                        ElseSteps = new List<IDialog> ()
+                        {
+                            new SendActivity("Hello {user.name}, nice to see you again! How can I be of help today?")
+                        }
+                    }
+                },
+                Rules = new List<IRule>()
+                {
                     new IntentRule("No_Name", 
                         steps: new List<IDialog>()
                         {
@@ -132,7 +148,19 @@ namespace CafeBotAdaptive
                             new SendActivity("I need your name to be able to address you correctly!")
                         }
                     ),
-                    new NoneIntentRule(
+                    new IntentRule()
+                    {
+                        Intent = "Get_user_name",
+                        Constraint = "(@userName != null) || (@userNamePatternAny != null)",
+                        Steps = new List<IDialog>()
+                        {
+                            new SaveEntity("user.name", "@userName"),
+                            new SaveEntity("user.name", "@userName_patternAny"),
+                            new SendActivity("Hello {user.name}, nice to meet you! How can I be of help today?"),
+                            new EndDialog()
+                        }
+                    },
+                    new UnknownIntentRule(
                         steps: new List<IDialog>()
                         {
                             new SendActivity("None intent in who are you dialog!")
