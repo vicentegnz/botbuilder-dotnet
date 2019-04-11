@@ -67,6 +67,10 @@ namespace CafeBotAdaptive
             _dialogAccessor = conversationState.CreateProperty<DialogState>(DialogStateProperty);
             _dialogs = new DialogSet(_dialogAccessor);
 
+            //var rootDialog = new AdaptiveDialog(rootDialogName);
+            //rootDialog.AutoEndDialog = false;
+            //rootDialog.Recognizer = new LuisRecognizer(new LuisApplication("f055b498-f436-4e0e-8faa-957618ae94ec", "a95d07785b374f0a9d7d40700e28a285", "https://westus.api.cognitive.microsoft.com"));
+            //rootDialog.AddRule(new IntentRule()
             var rootDialog = new AdaptiveDialog(rootDialogName)
             {
                 AutoEndDialog = false,
@@ -120,8 +124,11 @@ namespace CafeBotAdaptive
                         Condition = new ExpressionEngine().Parse("user.name == null"),
                         Steps = new List<IDialog> ()
                         {
-                            new SendActivity("Hello, I'm the cafe bot! What is your name?"),
-                            new EndTurn()
+                            new TextInput()
+                            {
+                                Prompt = new ActivityTemplate("Hello, I'm the cafe bot! What is your name?"),
+                                Property = "user.name"
+                            }
                         },
                         ElseSteps = new List<IDialog> ()
                         {
