@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\libraries\integration\Microsoft.Bot.Builder.Integration.AspNet.Core\Microsoft.Bot.Builder.Integration.AspNet.Core.csproj" />
-    <ProjectReference Include="..\..\libraries\Microsoft.Bot.Builder.AI.LanguageGeneration\Microsoft.Bot.Builder.AI.LanguageGeneration.csproj" />
     <ProjectReference Include="..\..\libraries\Microsoft.Bot.Builder.AI.LUIS\Microsoft.Bot.Builder.AI.Luis.csproj" />
     <ProjectReference Include="..\..\libraries\Microsoft.Bot.Builder.AI.QnA\Microsoft.Bot.Builder.AI.QnA.csproj" />
     <ProjectReference Include="..\..\libraries\Microsoft.Bot.Builder.Dialogs.Adaptive\Microsoft.Bot.Builder.Dialogs.Adaptive.csproj" />
@@ -26,6 +25,8 @@
     <ProjectReference Include="..\..\libraries\Microsoft.Bot.Builder.Dialogs\Microsoft.Bot.Builder.Dialogs.csproj" />
     <ProjectReference Include="..\..\libraries\Microsoft.Bot.Builder.Expressions.Parser\Microsoft.Bot.Builder.Expressions.Parser.csproj" />
     <ProjectReference Include="..\..\libraries\Microsoft.Bot.Builder.Expressions\Microsoft.Bot.Builder.Expressions.csproj" />
+    <ProjectReference Include="..\..\libraries\Microsoft.Bot.Builder.LanguageGeneration.Renderer\Microsoft.Bot.Builder.LanguageGeneration.Renderer.csproj" />
+    <ProjectReference Include="..\..\libraries\Microsoft.Bot.Builder.LanguageGeneration\Microsoft.Bot.Builder.LanguageGeneration.csproj" />
     <ProjectReference Include="..\..\libraries\Microsoft.Bot.Builder\Microsoft.Bot.Builder.csproj" />
     <ProjectReference Include="..\..\libraries\Microsoft.Bot.Connector\Microsoft.Bot.Connector.csproj" />
     <ProjectReference Include="..\..\libraries\Microsoft.Bot.Schema\Microsoft.Bot.Schema.csproj" />

@@ -105,17 +105,12 @@ namespace CafeBotAdaptive
                                 Condition = new ExpressionEngine().Parse("user.name == null"),
                                 Steps = new List<IDialog> ()
                                 {
-                                    new SendActivity("Hello, I'm the cafe bot!"),
-                                    new TextInput()
-                                    {
-                                        Prompt = new ActivityTemplate("Hello, what is your name?"),
-                                        Property = "user.name"
-                                    },
-                                    new SendActivity("Hello {user.name}, nice to meet you!")
+                                    new SendActivity("Hello, I'm the cafe bot! What is your name?"),
+                                    new EndTurn()
                                 },
                                 ElseSteps = new List<IDialog> ()
                                 {
-                                    new SendActivity("Hello {user.name}, nice to see you again!")
+                                    new SendActivity("Hello {user.name}, nice to see you again! How can I be of help today?")
                                 }
                             }
                         }
@@ -127,7 +122,8 @@ namespace CafeBotAdaptive
                             {
                                 Property = "user.name",
                                 Value = new ExpressionEngine().Parse("'Human'")
-                            }
+                            },
+                            new EndDialog()
                         }
                     ),
                     new IntentRule("Why_do_you_ask",
