@@ -21,6 +21,8 @@ namespace Microsoft.Bot.Builder.Tests
         private const string DefaultTranscriptRepositoryZipLocation = "https://github.com/Microsoft/BotBuilder/archive/master.zip";
         private const string TranscriptsZipFolder = "/Common/Transcripts/"; // Folder within the repo/zip
 
+        private static string transcriptsLocation = null;
+
         private static readonly object _syncRoot = new object();
 
         private static string TranscriptsLocalPath { get; set; } = @"..\..\..\..\..\tests\Transcripts\";
@@ -90,7 +92,7 @@ namespace Microsoft.Bot.Builder.Tests
                 return TranscriptsLocalPath;
             }
 
-            var transcriptsLocation = TestUtilities.GetKey(BotBuilderTranscriptsLocationKey) ?? DefaultTranscriptRepositoryZipLocation;
+            GetEnvironmentVars();
 
             var tempPath = Path.GetTempPath();
             var zipFilePath = Path.Combine(tempPath, Path.GetFileName(transcriptsLocation));
@@ -220,6 +222,18 @@ namespace Microsoft.Bot.Builder.Tests
             }
 
             return content;
+        }
+
+        private static void GetEnvironmentVars()
+        {
+            if (string.IsNullOrWhiteSpace(BotBuilderTranscriptsLocationKey))
+            {
+                transcriptsLocation = Environment.GetEnvironmentVariable("BOTBUILDER_TRANSCRIPTS_LOCATION");
+                if (string.IsNullOrWhiteSpace(BotBuilderTranscriptsLocationKey))
+                {
+                    transcriptsLocation = "https://github.com/Microsoft/BotBuilder/archive/master.zip";
+                }
+            }
         }
     }
 }

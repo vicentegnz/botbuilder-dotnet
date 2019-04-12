@@ -12,22 +12,6 @@ namespace Microsoft.Bot.Builder.Tests
 {
     public class TestUtilities
     {
-        private static Lazy<Dictionary<string, string>> environmentKeys = new Lazy<Dictionary<string, string>>(() =>
-        {
-            try
-            {
-                return File.ReadAllLines(@"\\fusebox\private\sdk\UnitTestKeys-new.cmd")
-                    .Where(l => l.StartsWith("@set", StringComparison.OrdinalIgnoreCase))
-                    .Select(l => l.Replace("@set ", string.Empty, StringComparison.OrdinalIgnoreCase).Split('='))
-                    .ToDictionary(pairs => pairs[0], pairs => pairs[1]);
-            }
-            catch (Exception err)
-            {
-                System.Diagnostics.Debug.WriteLine(err.Message);
-                return new Dictionary<string, string>();
-            }
-        });
-
         public static TurnContext CreateEmptyContext()
         {
             var b = new TestAdapter();
@@ -63,20 +47,5 @@ namespace Microsoft.Bot.Builder.Tests
                 throw new ArgumentException($"Unknown Type {typeof(T).Name}");
         }
         */
-
-        public static string GetKey(string key)
-        {
-            if (!environmentKeys.Value.TryGetValue(key, out var value))
-            {
-                // fallback to environment variables
-                value = Environment.GetEnvironmentVariable(key);
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    value = null;
-                }
-            }
-
-            return value;
-        }
     }
 }
