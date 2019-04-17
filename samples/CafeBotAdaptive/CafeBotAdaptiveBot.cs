@@ -15,6 +15,7 @@ using Microsoft.Bot.Builder.Dialogs.Adaptive.Steps;
 using Microsoft.Bot.Builder.Expressions;
 using Microsoft.Bot.Builder.Expressions.Parser;
 using Microsoft.Bot.Builder.Dialogs.Adaptive.Input;
+using System;
 
 namespace CafeBotAdaptive
 {
@@ -56,42 +57,40 @@ namespace CafeBotAdaptive
                 throw new System.ArgumentNullException(nameof(loggerFactory));
             }
 
-            _accessors = new CafeBotAdaptiveAccessors(conversationState)
-            {
-                CounterState = conversationState.CreateProperty<CounterState>(CafeBotAdaptiveAccessors.CounterStateName),
-            };
-
             _logger = loggerFactory.CreateLogger<CafeBotAdaptiveBot>();
             _logger.LogTrace("Turn start.");
 
             _dialogAccessor = conversationState.CreateProperty<DialogState>(DialogStateProperty);
             _dialogs = new DialogSet(_dialogAccessor);
 
-            //var rootDialog = new AdaptiveDialog(rootDialogName);
-            //rootDialog.AutoEndDialog = false;
-            //rootDialog.Recognizer = new LuisRecognizer(new LuisApplication("f055b498-f436-4e0e-8faa-957618ae94ec", "a95d07785b374f0a9d7d40700e28a285", "https://westus.api.cognitive.microsoft.com"));
-            //rootDialog.AddRule(new IntentRule()
             var rootDialog = new AdaptiveDialog(rootDialogName)
             {
                 AutoEndDialog = false,
-                Recognizer = new LuisRecognizer(new LuisApplication("f055b498-f436-4e0e-8faa-957618ae94ec", "a95d07785b374f0a9d7d40700e28a285", "https://westus.api.cognitive.microsoft.com")),
+                Recognizer = new LuisRecognizer(new LuisApplication("1195bcf1-4610-4285-982e-3a97cce409a2", "a95d07785b374f0a9d7d40700e28a285", "https://westus.api.cognitive.microsoft.com")),
                 Rules = new List<IRule>()
                 {
-                    new IntentRule("WhatCanYouDo",
+                    new IntentRule("Book_Flight",
                     steps: new List<IDialog>()
                     {
-                        new SendActivity("I can help you book a table, find cafe locations and more")
+                        new SendActivity("I can help you book a flight..")
                     }),
-                    new IntentRule("WhoAreYou",
+                    new IntentRule("Cancel",
                     steps: new List<IDialog>()
                     {
-                        new BeginDialog(whoAreYouDialogName)
+                        new SendActivity("Sure, I've cancelled that."),
+                        new CancelAllDialogs(),
+                        new SendActivity("Thank you."),
+                        new EndDialog()
                     }),
                     new UnknownIntentRule(
                     steps: new List<IDialog>()
                     {
                         new SendActivity("Sorry, I do not understand that. Try saying 'who are you' or 'what can you do")
-                    })
+                    }),
+                    new EventRule(new List<String>() { AdaptiveEvents.ActivityReceived }, new List<IDialog>()
+                    {
+                        new SendActivity("Value: {turn.activity.text}")
+                    }, constraint:"turn.DialogEvent.Value.Intents.Welcome.Score > 0")
                 }
             };
 
@@ -197,8 +196,8 @@ namespace CafeBotAdaptive
             // Handle Message activity type, which is the main activity type for shown within a conversational interface
             // Message activities may contain text, speech, interactive cards, and binary or unknown attachments.
             // see https://aka.ms/about-bot-activity-message to learn more about the message and other activity types
-            if (turnContext.Activity.Type == ActivityTypes.Message)
-            {
+            //if (turnContext.Activity.Type == ActivityTypes.Message)
+            //{
                 // Create dialog context.
                 var dc = await _dialogs.CreateContextAsync(turnContext);
 
@@ -210,11 +209,11 @@ namespace CafeBotAdaptive
                 {
                     await dc.BeginDialogAsync(rootDialogName);
                 }
-            }
-            else
-            {
+            //}
+            //else
+            //{
                 await turnContext.SendActivityAsync($"{turnContext.Activity.Type} event detected");
-            }
+            //}
         }
     }
 }
