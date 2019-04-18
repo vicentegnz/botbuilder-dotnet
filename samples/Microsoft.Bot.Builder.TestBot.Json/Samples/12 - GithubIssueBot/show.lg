@@ -1,5 +1,5 @@
-﻿# Show
-- You have following issues : \n {humanize(dialog.getResponse, '[showSingleUrl]', '\n')}
+# Show
+- You have following issues : \n {join(foreach(dialog.getResponse, x, lgTemplate('showSingleUrl', x)), '\n')}
 
 # showSingleUrl(x)
 - ```
@@ -14,7 +14,7 @@
                     "type": "TextBlock",
                     "size": "Medium",
                     "weight": "Bolder",
-                    "text": "${x.title}"
+                    "text": "@{x.title}"
                 },
                 {
                     "type": "ColumnSet",

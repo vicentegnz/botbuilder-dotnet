@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Bot.Builder.Expressions;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Bot.Builder.LanguageGeneration
 {
@@ -36,12 +37,6 @@ namespace Microsoft.Bot.Builder.LanguageGeneration
                     return new ExpressionEvaluator(BuiltInFunctions.Apply(this.LgTemplate), ReturnType.String, this.ValidLgTemplate);
                 case "join":
                     return new ExpressionEvaluator(BuiltInFunctions.Apply(this.Join));
-                case "foreach":
-                case "map":
-                    return new ExpressionEvaluator(BuiltInFunctions.Apply(this.Foreach));
-                case "mapjoin":
-                case "humanize":
-                    return new ExpressionEvaluator(BuiltInFunctions.Apply(this.ForeachThenJoin));
             }
             return BuiltInFunctions.Lookup(name);
         }
@@ -96,13 +91,13 @@ namespace Microsoft.Bot.Builder.LanguageGeneration
         {
             object result = null;
             if (parameters.Count == 2 &&
-                parameters[0] is IList p0 &&
+                BuiltInFunctions.TryParseList(parameters[0], out var p0) &&
                 parameters[1] is String sep)
             {
                 result = String.Join(sep + " ", p0.OfType<object>().Select(x => x.ToString())); // "," => ", " 
             }
             else if (parameters.Count == 3 &&
-                parameters[0] is IList li &&
+                BuiltInFunctions.TryParseList(parameters[0], out var li) &&
                 parameters[1] is String sep1 &&
                 parameters[2] is String sep2)
             {

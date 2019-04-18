@@ -17,27 +17,22 @@ using Microsoft.Bot.Builder.Dialogs.Declarative.Resources;
 using Microsoft.Bot.Builder.Dialogs.Declarative.Types;
 using Microsoft.Bot.Builder.Integration;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
-using Microsoft.Bot.Builder.TestBot.Json.Recognizers;
 using Microsoft.Bot.Schema;
+using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Debug;
+using System.Diagnostics;
+using System.IO;
 
 namespace Microsoft.Bot.Builder.TestBot.Json
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env)
+        public Startup(IHostingEnvironment env, IConfiguration configuration)
         {
-            HostingEnvironment = env;
-
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-                .AddEnvironmentVariables();
-
-            Configuration = builder.Build();
+            this.HostingEnvironment = env;
+            this.Configuration = configuration;
 
             // set the configuration for types
             TypeFactory.Configuration = this.Configuration;
@@ -46,7 +41,6 @@ namespace Microsoft.Bot.Builder.TestBot.Json
             TypeFactory.RegisterAdaptiveTypes();
 
             // register custom types
-            TypeFactory.Register("Testbot.RuleRecognizer", typeof(RuleRecognizer));
             TypeFactory.Register("Testbot.CalculateDogYears", typeof(CalculateDogYears));
             TypeFactory.Register("Testbot.JavascriptStep", typeof(JavascriptStep));
             TypeFactory.Register("Testbot.CSharpStep", typeof(CSharpStep));
@@ -72,31 +66,35 @@ namespace Microsoft.Bot.Builder.TestBot.Json
             {
                 // by setting the source registry all dialogs will register themselves to be debugged as execution flows
                 DebugSupport.SourceRegistry = sourceMap;
-                debugAdapter = new DebugAdapter(sourceMap, sourceMap, new DebugLogger(nameof(DebugAdapter)));
+                var model = new DataModel(Coercion.Instance);
+                var port = Configuration.GetValue<int>("debugport", 4712);
+                Console.WriteLine($"Debugger listening on port:{port}");
+                Console.WriteLine("     use --debugport # or use 'debugport' setting to change)");
+                debugAdapter = new DebugAdapter(port, model, sourceMap, sourceMap, new DebugLogger(nameof(DebugAdapter)));
             }
 
-            // m
             services.AddSingleton<IConfiguration>(this.Configuration);
 
             IStorage dataStore = new MemoryStorage();
-            var conversationState = new ConversationState(dataStore);
             var userState = new UserState(dataStore);
-            var userStateMap = userState.CreateProperty<Dictionary<string, object>>("user");
-            var accessors = new TestBotAccessors
-            {
-                ConversationDialogState = conversationState.CreateProperty<DialogState>("DialogState"),
-                ConversationState = conversationState,
-                UserState = userState
-            };
+            var conversationState = new ConversationState(dataStore);
+
 
             // manage all bot resources
-            var resourceExplorer = ResourceExplorer.LoadProject(HostingEnvironment.ContentRootPath);
+            var resourceExplorer = ResourceExplorer
+                .LoadProject(HostingEnvironment.ContentRootPath, ignoreFolders: new string[] { "models" });
+
+            // add LuisRecognizer .dialog files for current environment/authoringRegion
+            var environment = Configuration.GetValue<string>("luis:environment", Environment.UserName);
+            var authoringRegion = Configuration.GetValue<string>("luis:authoringRegion", "westus");
+            var luisModelsFolder = Path.Combine(HostingEnvironment.ContentRootPath, "models", environment, authoringRegion);
+            resourceExplorer.AddFolder(luisModelsFolder);
 
             services.AddBot<IBot>(
                 (IServiceProvider sp) =>
                 {
                     // declarative Adaptive dialogs bot sample
-                    return new TestBot(accessors, resourceExplorer, DebugSupport.SourceRegistry);
+                    return new TestBot(userState, conversationState, resourceExplorer, DebugSupport.SourceRegistry);
 
                     // LG bot sample
                     // return new TestBotLG(accessors);
@@ -109,6 +107,7 @@ namespace Microsoft.Bot.Builder.TestBot.Json
                         await conversationState.SaveChangesAsync(turnContext);
                     };
 
+                    options.CredentialProvider = new SimpleCredentialProvider(this.Configuration["AppId"], this.Configuration["AppPassword"]);
                     options.Middleware.Add(new RegisterClassMiddleware<IStorage>(dataStore));
                     options.Middleware.Add(new RegisterClassMiddleware<ResourceExplorer>(resourceExplorer));
 

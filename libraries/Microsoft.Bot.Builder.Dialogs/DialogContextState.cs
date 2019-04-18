@@ -210,6 +210,37 @@ namespace Microsoft.Bot.Builder.Dialogs
             }
         }
 
+        public bool HasValue<T>(string pathExpression)
+        {
+            return HasValue<T>(this, pathExpression);
+        }
+
+        public bool HasValue<T>(object o, string pathExpression)
+        {
+            JToken result = null;
+            if (o != null && o.GetType() == typeof(JArray))
+            {
+                int index = 0;
+                if (int.TryParse(pathExpression, out index) && index < JArray.FromObject(o).Count)
+                {
+                    result = JArray.FromObject(o)[index];
+                }
+            }
+            else
+            {
+                result = JToken.FromObject(o).SelectToken(pathExpression);
+            }
+
+            if (result != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public void SetValue(string pathExpression, object value)
         {
             if (value is Task)
@@ -235,7 +266,15 @@ namespace Microsoft.Bot.Builder.Dialogs
                 }
             }
 
-            current[segments.Last()] = value;
+            if (value is JToken || value is JObject || value is JArray)
+            {
+                current[segments.Last()] = (JToken)value;
+            }
+            else
+            {
+                current[segments.Last()] = value;
+
+            }
         }
 
         public void Add(string key, object value)
