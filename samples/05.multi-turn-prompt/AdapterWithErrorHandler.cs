@@ -2,8 +2,12 @@
 // Licensed under the MIT License.
 
 using System;
+using System.IO;
 using Microsoft.Bot.Builder;
+using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Builder.Dialogs.Declarative.Resources;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
+using Microsoft.Bot.Builder.LanguageGeneration.Renderer;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Extensions.Logging;
 
@@ -14,6 +18,16 @@ namespace Microsoft.BotBuilderSamples
         public AdapterWithErrorHandler(ICredentialProvider credentialProvider, ILogger<BotFrameworkHttpAdapter> logger, ConversationState conversationState = null)
             : base(credentialProvider)
         {
+            // manage all bot resources
+            var resourceExplorer = ResourceExplorer
+                .LoadProject(Directory.GetCurrentDirectory(), ignoreFolders: new string[] { "models" });
+
+            //resourceExplorer.AddFolder(luisModelsFolder);
+
+            var lg = new LGLanguageGenerator(resourceExplorer);
+            Use(new RegisterClassMiddleware<ILanguageGenerator>(lg));
+            Use(new RegisterClassMiddleware<IMessageActivityGenerator>(new TextMessageActivityGenerator(lg)));
+
             OnTurnError = async (turnContext, exception) =>
             {
                 // Log any leaked exception from the application.
