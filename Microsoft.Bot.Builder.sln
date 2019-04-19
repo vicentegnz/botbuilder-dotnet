@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.329
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{4269F3C3-6B42-419B-B64A-3E6DC0F1574A}"
 EndProject
@@ -110,7 +110,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Bot.Builder.Dialo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Bot.Builder.LanguageGeneration.Tests", "tests\Microsoft.Bot.Builder.LanguageGeneration.Tests\Microsoft.Bot.Builder.LanguageGeneration.Tests.csproj", "{72EE26E2-E8BE-4169-82AD-93E021539C34}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Bot.Builder.LanguageGeneration.Renderer.Tests", "tests\Microsoft.Bot.Builder.LanguageGeneration.Renderer.Tests\Microsoft.Bot.Builder.LanguageGeneration.Renderer.Tests.csproj", "{240646C5-EFCB-4CF1-AF8E-7036558CD78C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Bot.Builder.LanguageGeneration.Renderer.Tests", "tests\Microsoft.Bot.Builder.LanguageGeneration.Renderer.Tests\Microsoft.Bot.Builder.LanguageGeneration.Renderer.Tests.csproj", "{240646C5-EFCB-4CF1-AF8E-7036558CD78C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CafeBotAdaptive", "samples\CafeBotAdaptive\CafeBotAdaptive.csproj", "{EE3FAA2C-AD22-4F81-AE8F-3DAFEF5C904F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MultiTurnPromptBot", "samples\05.multi-turn-prompt\MultiTurnPromptBot.csproj", "{45D9772A-EEC0-474E-84FD-430932EEC08B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -511,6 +515,22 @@ Global
 		{240646C5-EFCB-4CF1-AF8E-7036558CD78C}.Documentation|Any CPU.Build.0 = Debug|Any CPU
 		{240646C5-EFCB-4CF1-AF8E-7036558CD78C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{240646C5-EFCB-4CF1-AF8E-7036558CD78C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE3FAA2C-AD22-4F81-AE8F-3DAFEF5C904F}.Debug - NuGet Packages|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE3FAA2C-AD22-4F81-AE8F-3DAFEF5C904F}.Debug - NuGet Packages|Any CPU.Build.0 = Debug|Any CPU
+		{EE3FAA2C-AD22-4F81-AE8F-3DAFEF5C904F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE3FAA2C-AD22-4F81-AE8F-3DAFEF5C904F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE3FAA2C-AD22-4F81-AE8F-3DAFEF5C904F}.Documentation|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE3FAA2C-AD22-4F81-AE8F-3DAFEF5C904F}.Documentation|Any CPU.Build.0 = Debug|Any CPU
+		{EE3FAA2C-AD22-4F81-AE8F-3DAFEF5C904F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE3FAA2C-AD22-4F81-AE8F-3DAFEF5C904F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45D9772A-EEC0-474E-84FD-430932EEC08B}.Debug - NuGet Packages|Any CPU.ActiveCfg = Debug|Any CPU
+		{45D9772A-EEC0-474E-84FD-430932EEC08B}.Debug - NuGet Packages|Any CPU.Build.0 = Debug|Any CPU
+		{45D9772A-EEC0-474E-84FD-430932EEC08B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45D9772A-EEC0-474E-84FD-430932EEC08B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45D9772A-EEC0-474E-84FD-430932EEC08B}.Documentation|Any CPU.ActiveCfg = Debug|Any CPU
+		{45D9772A-EEC0-474E-84FD-430932EEC08B}.Documentation|Any CPU.Build.0 = Debug|Any CPU
+		{45D9772A-EEC0-474E-84FD-430932EEC08B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45D9772A-EEC0-474E-84FD-430932EEC08B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -568,6 +588,8 @@ Global
 		{F59673EA-2D0D-441A-BB85-CD343DE6BE45} = {AD743B78-D61F-4FBF-B620-FA83CE599A50}
 		{72EE26E2-E8BE-4169-82AD-93E021539C34} = {AD743B78-D61F-4FBF-B620-FA83CE599A50}
 		{240646C5-EFCB-4CF1-AF8E-7036558CD78C} = {AD743B78-D61F-4FBF-B620-FA83CE599A50}
+		{EE3FAA2C-AD22-4F81-AE8F-3DAFEF5C904F} = {1DEDDC46-F2F4-448F-A0B7-FD48682EEC80}
+		{45D9772A-EEC0-474E-84FD-430932EEC08B} = {1DEDDC46-F2F4-448F-A0B7-FD48682EEC80}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7173C9F3-A7F9-496E-9078-9156E35D6E16}
