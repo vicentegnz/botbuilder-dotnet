@@ -21,6 +21,7 @@ namespace Microsoft.Bot.Builder.Dialogs.Debugging
         private readonly IDataModel model;
         private readonly Source.IRegistry registry;
         private readonly IBreakpoints breakpoints;
+        private readonly Action terminate;
 
         // lifetime scoped to IMiddleware.OnTurnAsync
         private readonly ConcurrentDictionary<ITurnContext, ThreadModel> threadByContext = new ConcurrentDictionary<ITurnContext, ThreadModel>();
@@ -101,14 +102,14 @@ namespace Microsoft.Bot.Builder.Dialogs.Debugging
 
         private readonly Task task;
 
-        public DebugAdapter(int port, IDataModel model, Source.IRegistry registry, IBreakpoints breakpoints, ILogger logger)
+        public DebugAdapter(int port, IDataModel model, Source.IRegistry registry, IBreakpoints breakpoints, Action terminate, ILogger logger)
             : base(logger)
         {
             this.model = model ?? throw new ArgumentNullException(nameof(model));
             this.registry = registry ?? throw new ArgumentNullException(nameof(registry));
             this.breakpoints = breakpoints ?? throw new ArgumentNullException(nameof(breakpoints));
-            this.task = ListenAsync(new IPEndPoint(IPAddress.Any, port: port), cancellationToken.Token);
-            //threads.Add(new BotThreadModel());
+            this.terminate = terminate ?? throw new ArgumentNullException(nameof(terminate));
+            this.task = ListenAsync(new IPEndPoint(IPAddress.Any, port), cancellationToken.Token);
         }
 
         public async Task DisposeAsync()
@@ -476,10 +477,15 @@ namespace Microsoft.Bot.Builder.Dialogs.Debugging
 
                 return Protocol.Response.From(NextSeq, next, new { });
             }
+            else if (message is Protocol.Request<Protocol.Disconnect> terminate)
+            {
+                this.terminate();
+
+                return Protocol.Response.From(NextSeq, terminate, new { });
+            }
             else if (message is Protocol.Request<Protocol.Disconnect> disconnect)
             {
-                // possibly run all threads
-
+                // if attach, possibly run all threads
                 return Protocol.Response.From(NextSeq, disconnect, new { });
             }
             else if (message is Protocol.Request request)
