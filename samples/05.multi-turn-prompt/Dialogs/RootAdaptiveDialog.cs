@@ -50,8 +50,7 @@ namespace Microsoft.BotBuilderSamples
                 new ConfirmInput()
                 {
                     Prompt = new ActivityTemplate("Would you like to give your age?"),
-                    Property = "turn.ageConfirmation",
-                    AlwaysPrompt = true
+                    Property = "turn.ageConfirmation"
                 },
                 new IfCondition()
                 {
