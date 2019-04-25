@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Adaptive;
 using Microsoft.Bot.Builder.Dialogs.Adaptive.Input;
-using Microsoft.Bot.Builder.Dialogs.Adaptive.Recognizers;
-using Microsoft.Bot.Builder.Dialogs.Adaptive.Rules;
 using Microsoft.Bot.Builder.Dialogs.Adaptive.Steps;
-using Microsoft.Bot.Builder.Expressions;
 using Microsoft.Bot.Builder.Expressions.Parser;
 
 namespace Microsoft.BotBuilderSamples
@@ -23,7 +17,7 @@ namespace Microsoft.BotBuilderSamples
             var rootDialog = new AdaptiveDialog(nameof(AdaptiveDialog))
             {
                 // These steps are executed when this Adaptive Dialog begins
-                Steps = OnBeginDialogSteps(),
+                Steps = BeginDialogSteps(),
             };
 
             // Add named dialogs to the DialogSet. These names are saved in the dialog state.
@@ -32,10 +26,11 @@ namespace Microsoft.BotBuilderSamples
             // The initial child Dialog to run.
             InitialDialogId = nameof(AdaptiveDialog);
         }
-        private static List<IDialog> OnBeginDialogSteps()
+        private static List<IDialog> BeginDialogSteps()
         {
             return new List<IDialog>()
             {
+                // Ask for user's age and set it in user.userProfile scope.
                 new TextInput()
                 {
                     Prompt = new ActivityTemplate("Please enter your mode of transport."),
@@ -46,12 +41,13 @@ namespace Microsoft.BotBuilderSamples
                     Prompt = new ActivityTemplate("Please enter your name."),
                     Property = "user.userProfile.Name"
                 },
+                // Send activity supports full language generation. So you can refer to properties inline
+                // or use pre-built functions inline or use language generation templates.
                 new SendActivity("Thanks, {user.userProfile.Name}"),
                 new ConfirmInput()
                 {
                     Prompt = new ActivityTemplate("Would you like to give your age?"),
-                    Property = "turn.ageConfirmation",
-                    AlwaysPrompt = true
+                    Property = "turn.ageConfirmation"
                 },
                 new IfCondition()
                 {
@@ -61,10 +57,12 @@ namespace Microsoft.BotBuilderSamples
                          new NumberInput<int>()
                          {
                              Prompt = new ActivityTemplate("Please enter your age."),
+                             Property = "user.userProfile.Age",
+                             // Set min and max constraints for age.
                              MinValue = 1,
                              MaxValue = 150,
-                             RetryPrompt = new ActivityTemplate("The value entered must be greater than 0 and less than 150."),
-                             Property = "user.userProfile.Age"
+                             // Specify a retry prompt if user input does not meet min or max constraint.
+                             RetryPrompt = new ActivityTemplate("Sorry that does not work! Your age must be greater than 0 and less than 150."),
                          },
                          new SendActivity("I have your age as {user.userProfile.Age}.")
                     },
@@ -76,8 +74,7 @@ namespace Microsoft.BotBuilderSamples
                 new ConfirmInput()
                 {
                     Prompt = new ActivityTemplate("Is this ok?"),
-                    Property = "user.finalConfirmation",
-                    AlwaysPrompt = true
+                    Property = "user.finalConfirmation"
                 },
                 // Use LG template to come back with the final read out.
                 // This LG template is a great example of what logic can be wrapped up in LG sub-system.

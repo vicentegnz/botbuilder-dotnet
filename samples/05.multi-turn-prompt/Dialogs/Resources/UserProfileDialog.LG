@@ -5,5 +5,5 @@
     - Thanks. Your profile will not be kept.
 
 # UserAgeReadBack
-- IF : {user.userProfile.Age}
+- IF : {user.userProfile.Age != null}
     - And age as {user.userProfile.Age}.
