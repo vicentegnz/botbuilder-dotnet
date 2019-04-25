@@ -33,7 +33,7 @@ namespace Microsoft.Bot.Builder.Dialogs.Adaptive.Input
             }
 
             // Check value in state and only call if missing or required by AlwaysPrompt
-            var hasValue = Property == null ? false : dc.State.HasValue<FoundChoice>(Property);
+            var hasValue = Property == null ? false : dc.State.HasValue(Property);
 
             if (hasValue == false || AlwaysPrompt)
             {
@@ -78,6 +78,18 @@ namespace Microsoft.Bot.Builder.Dialogs.Adaptive.Input
                 return await dc.EndDialogAsync(cancellationToken: cancellationToken);
             }
         }
+
+        public override Task<DialogTurnResult> ResumeDialogAsync(DialogContext dc, DialogReason reason, object result = null, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            FoundChoice foundChoice = result as FoundChoice;
+            if (foundChoice != null)
+            {
+                // return value insted of FoundChoice object
+                return base.ResumeDialogAsync(dc, reason, foundChoice.Value, cancellationToken);
+            }
+            return base.ResumeDialogAsync(dc, reason, result, cancellationToken);
+        }
+
         protected override string OnComputeId()
         {
             return $"ChoiceInput[{BindingPath()}]";
