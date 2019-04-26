@@ -19,7 +19,12 @@
       "name": "ViewToDoDialog"
     }
   ],
-  "entities": [],
+  "entities": [
+    {
+      "name": "todoTitle",
+      "roles": []
+    }
+  ],
   "composites": [],
   "closedLists": [],
   "regex_entities": [],
@@ -214,6 +219,83 @@
       "entities": []
     },
     {
+      "text": "Please remind me to buy milk",
+      "intent": "AddToDoDialog",
+      "entities": [
+        {
+          "entity": "todoTitle",
+          "startPos": 20,
+          "endPos": 27
+        }
+      ]
+    },
+    {
+      "text": "Please remember that I need to buy milk",
+      "intent": "AddToDoDialog",
+      "entities": [
+        {
+          "entity": "todoTitle",
+          "startPos": 31,
+          "endPos": 38
+        }
+      ]
+    },
+    {
+      "text": "I need you to remember that my wife's birthday is Jan 9th",
+      "intent": "AddToDoDialog",
+      "entities": [
+        {
+          "entity": "todoTitle",
+          "startPos": 28,
+          "endPos": 56
+        }
+      ]
+    },
+    {
+      "text": "Add a todo named send report over this weekend",
+      "intent": "AddToDoDialog",
+      "entities": [
+        {
+          "entity": "todoTitle",
+          "startPos": 17,
+          "endPos": 45
+        }
+      ]
+    },
+    {
+      "text": "Add get a new car to the todo list",
+      "intent": "AddToDoDialog",
+      "entities": [
+        {
+          "entity": "todoTitle",
+          "startPos": 4,
+          "endPos": 16
+        }
+      ]
+    },
+    {
+      "text": "Add write a spec to the list",
+      "intent": "AddToDoDialog",
+      "entities": [
+        {
+          "entity": "todoTitle",
+          "startPos": 4,
+          "endPos": 15
+        }
+      ]
+    },
+    {
+      "text": "Add finish this demo to my todo list",
+      "intent": "AddToDoDialog",
+      "entities": [
+        {
+          "entity": "todoTitle",
+          "startPos": 4,
+          "endPos": 19
+        }
+      ]
+    },
+    {
       "text": "Remove todo",
       "intent": "DeleteToDoDialog",
       "entities": []
@@ -321,23 +403,27 @@
   ],
   "patterns": [
     {
-      "pattern": "Please remember [to] {todoTitle}",
+      "pattern": "Please remember [to] {todoTitle.patternAny}",
       "intent": "AddToDoDialog"
     },
     {
-      "pattern": "I need you to remember [that] {todoTitle}",
+      "pattern": "I need you to remember [that] {todoTitle.patternAny}",
       "intent": "AddToDoDialog"
     },
     {
-      "pattern": "Add a todo named {todoTitle}",
+      "pattern": "Add a todo named {todoTitle.patternAny}",
       "intent": "AddToDoDialog"
     },
     {
-      "pattern": "Add {todoTitle} to the list",
+      "pattern": "Add {todoTitle.patternAny} to the list",
       "intent": "AddToDoDialog"
     },
     {
-      "pattern": "[Please] add {todoTitle} to the todo list",
+      "pattern": "[Please] add {todoTitle.patternAny} to the todo list",
+      "intent": "AddToDoDialog"
+    },
+    {
+      "pattern": "Add {todoTitle.patternAny} to my todo",
       "intent": "AddToDoDialog"
     },
     {
@@ -359,7 +445,7 @@
   ],
   "patternAnyEntities": [
     {
-      "name": "todoTitle",
+      "name": "todoTitle.patternAny",
       "explicitList": [],
       "roles": []
     }

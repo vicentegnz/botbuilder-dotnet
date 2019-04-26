@@ -33,23 +33,26 @@ namespace Microsoft.BotBuilderSamples
                     // @EntityName is a short-hand for turn.entities.<EntityName>. Other useful short-hands are 
                     //     #IntentName is a short-hand for turn.intents.<IntentName>
                     //     $PropertyName is a short-hand for dialog.results.<PropertyName>
-                    //new SaveEntity("turn.addTodo.title", "@todoTitle[0]"),
-                    new SaveEntity()
-                    {
-                        Property = "turn.addTodo.title",
-                        Entity = "turn.entities.todoTitle[0]"
+                    
+                    new SaveEntity() {
+                        Property = "turn.todoTitle",
+                        Entity = "@todoTitle[0]"
+                    },
+                    new SaveEntity() {
+                        Property = "turn.todoTitle",
+                        Entity = "@todoTitle_patternAny[0]"
                     },
                     // TextInput by default will skip the prompt if the property has value.
                     new TextInput()
                     {
-                        Property = "turn.addTodo.title",
+                        Property = "turn.todoTitle",
                         Prompt = new ActivityTemplate("[Get-ToDo-Title]")
                     },
                     // Add the new todo title to the list of todos
                     new EditArray()
                     {
-                        ItemProperty = "user.todos",
-                        ArrayProperty = "turn.addTodo.title",
+                        ItemProperty = "turn.todoTitle",
+                        ArrayProperty = "user.todos",
                         ChangeType = EditArray.ArrayChangeType.Push
                     },
                     new SendActivity("[Add-ToDo-ReadBack]"),
@@ -74,11 +77,13 @@ namespace Microsoft.BotBuilderSamples
                                 Property = "turn.addTodo.cancelConfirmation",
                                 Prompt = new ActivityTemplate("[Confirm-cancellation]")
                             },
+                            new SendActivity("Confirmation outcome: {turn.addTodo.cancelConfirmation}"),
                             new IfCondition()
                             {
                                 Condition = new ExpressionEngine().Parse("turn.addTodo.cancelConfirmation == true"),
                                 Steps = new List<IDialog>()
                                 {
+                                    new SendActivity("Cancelling add todo..."),
                                     new EndDialog()
                                 }
                                 // We do not need to specify an else block here since if user said no,
@@ -92,10 +97,9 @@ namespace Microsoft.BotBuilderSamples
                     {
                         Steps = new List<IDialog>()
                         {
-                            new SendActivity("Entities: {turn.entities}"),
-                            new SendActivity("Activity: {turn.activity.text}"),
+                            // Set what user said as the todo title.
                             new SetProperty() {
-                                Property = "turn.addTodo.title",
+                                Property = "turn.todoTitle",
                                 Value = new ExpressionEngine().Parse("turn.activity.text")
                             }
                         }

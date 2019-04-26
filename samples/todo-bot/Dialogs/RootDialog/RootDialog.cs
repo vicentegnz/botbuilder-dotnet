@@ -44,13 +44,13 @@ namespace Microsoft.BotBuilderSamples
                 }
             };
 
-            // Add all child dialogs
-            rootDialog.AddDialog(new List<IDialog>() { new ViewToDoDialog() });
-            rootDialog.AddDialog(new List<IDialog>() { new AddToDoDialog() });
-            rootDialog.AddDialog(new List<IDialog>() { new DeleteToDoDialog() });
-
             // Add named dialogs to the DialogSet. These names are saved in the dialog state.
             AddDialog(rootDialog);
+
+            // Add all child dialogS
+            AddDialog(new AddToDoDialog());
+            AddDialog(new DeleteToDoDialog());
+            AddDialog(new ViewToDoDialog());
 
             // The initial child Dialog to run.
             InitialDialogId = nameof(AdaptiveDialog);

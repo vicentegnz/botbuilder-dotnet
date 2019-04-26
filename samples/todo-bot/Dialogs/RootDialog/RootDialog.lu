@@ -52,15 +52,25 @@ $ todoItem : PhraseList interchangeable
    - collection
    - list
 
+$ todoTitle : simple
+
 # AddToDoDialog
 - Add todo
 - add a to do item
 > Add some patterns
-- Please remember [to] {todoTitle}
-- I need you to remember [that] {todoTitle}
-- Add a todo named {todoTitle}
-- Add {todoTitle} to the list
-- [Please] add {todoTitle} to the todo list
+- Please remember [to] {todoTitle.patternAny}
+- I need you to remember [that] {todoTitle.patternAny}
+- Add a todo named {todoTitle.patternAny}
+- Add {todoTitle.patternAny} to the list
+- [Please] add {todoTitle.patternAny} to the todo list
+- Add {todoTitle.patternAny} to my todo
+- Please remind me to {todoTitle=buy milk}
+- Please remember that I need to {todoTitle=buy milk}
+- I need you to remember that {todoTitle=my wife's birthday is Jan 9th}
+- Add a todo named {todoTitle=send report over this weekend}
+- Add {todoTitle=get a new car} to the todo list
+- Add {todoTitle=write a spec} to the list
+- Add {todoTitle=finish this demo} to my todo list
 
 # DeleteToDoDialog
 - Remove todo
