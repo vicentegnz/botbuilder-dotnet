@@ -118,6 +118,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MultiTurnPromptBot", "sampl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreBot", "samples\13.core-bot\CoreBot.csproj", "{ED6C92BA-3EAB-4E97-914F-E90F30B53F48}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ToDoBotWithLUIS", "samples\todo-bot\ToDoBotWithLUIS.csproj", "{D4BBB9AF-1B66-4E7B-BA62-2B27F5CFD4B8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug - NuGet Packages|Any CPU = Debug - NuGet Packages|Any CPU
@@ -541,6 +543,14 @@ Global
 		{ED6C92BA-3EAB-4E97-914F-E90F30B53F48}.Documentation|Any CPU.Build.0 = Debug|Any CPU
 		{ED6C92BA-3EAB-4E97-914F-E90F30B53F48}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED6C92BA-3EAB-4E97-914F-E90F30B53F48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4BBB9AF-1B66-4E7B-BA62-2B27F5CFD4B8}.Debug - NuGet Packages|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4BBB9AF-1B66-4E7B-BA62-2B27F5CFD4B8}.Debug - NuGet Packages|Any CPU.Build.0 = Debug|Any CPU
+		{D4BBB9AF-1B66-4E7B-BA62-2B27F5CFD4B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4BBB9AF-1B66-4E7B-BA62-2B27F5CFD4B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4BBB9AF-1B66-4E7B-BA62-2B27F5CFD4B8}.Documentation|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4BBB9AF-1B66-4E7B-BA62-2B27F5CFD4B8}.Documentation|Any CPU.Build.0 = Debug|Any CPU
+		{D4BBB9AF-1B66-4E7B-BA62-2B27F5CFD4B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4BBB9AF-1B66-4E7B-BA62-2B27F5CFD4B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -601,6 +611,7 @@ Global
 		{EE3FAA2C-AD22-4F81-AE8F-3DAFEF5C904F} = {1DEDDC46-F2F4-448F-A0B7-FD48682EEC80}
 		{45D9772A-EEC0-474E-84FD-430932EEC08B} = {1DEDDC46-F2F4-448F-A0B7-FD48682EEC80}
 		{ED6C92BA-3EAB-4E97-914F-E90F30B53F48} = {1DEDDC46-F2F4-448F-A0B7-FD48682EEC80}
+		{D4BBB9AF-1B66-4E7B-BA62-2B27F5CFD4B8} = {1DEDDC46-F2F4-448F-A0B7-FD48682EEC80}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7173C9F3-A7F9-496E-9078-9156E35D6E16}
