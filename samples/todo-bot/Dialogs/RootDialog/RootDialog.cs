@@ -9,6 +9,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs.Adaptive.Rules;
 using Microsoft.Bot.Builder.Dialogs.Adaptive.Steps;
+using Microsoft.Bot.Builder.Dialogs.Adaptive.Input;
+using Microsoft.Bot.Builder.Expressions.Parser;
 
 namespace Microsoft.BotBuilderSamples
 {

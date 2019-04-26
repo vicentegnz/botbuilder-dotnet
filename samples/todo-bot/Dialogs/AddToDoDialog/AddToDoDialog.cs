@@ -33,7 +33,6 @@ namespace Microsoft.BotBuilderSamples
                     // @EntityName is a short-hand for turn.entities.<EntityName>. Other useful short-hands are 
                     //     #IntentName is a short-hand for turn.intents.<IntentName>
                     //     $PropertyName is a short-hand for dialog.results.<PropertyName>
-                    
                     new SaveEntity() {
                         Property = "turn.todoTitle",
                         Entity = "@todoTitle[0]"
@@ -55,8 +54,10 @@ namespace Microsoft.BotBuilderSamples
                         ArrayProperty = "user.todos",
                         ChangeType = EditArray.ArrayChangeType.Push
                     },
-                    new SendActivity("[Add-ToDo-ReadBack]"),
-                    new EndDialog()
+                    new SendActivity("[Add-ToDo-ReadBack]")
+                    // All child dialogs will automatically end if there are no additional steps to execute. 
+                    // If you wish for a child dialog to not end automatically, you can set 
+                    // AutoEndDialog property on the Adaptive Dialog to 'false'
                 },
                 Rules = new List<IRule>()
                 {
@@ -77,7 +78,6 @@ namespace Microsoft.BotBuilderSamples
                                 Property = "turn.addTodo.cancelConfirmation",
                                 Prompt = new ActivityTemplate("[Confirm-cancellation]")
                             },
-                            new SendActivity("Confirmation outcome: {turn.addTodo.cancelConfirmation}"),
                             new IfCondition()
                             {
                                 Condition = new ExpressionEngine().Parse("turn.addTodo.cancelConfirmation == true"),
@@ -85,10 +85,16 @@ namespace Microsoft.BotBuilderSamples
                                 {
                                     new SendActivity("Cancelling add todo..."),
                                     new EndDialog()
+                                },
+                                ElseSteps = new List<IDialog>()
+                                {
+                                    new SendActivity("Sure, no problem..")
                                 }
                                 // We do not need to specify an else block here since if user said no,
                                 // the control flow will automatically return to the last active step (if any)
-                            }
+                            },
+                            //new SendActivity("Confirmation outcome: {turn.addTodo.cancelConfirmation}")
+
                         }
                     },
                     // Since we are using a regex recognizer, anything except for help or cancel will come back as none intent.
