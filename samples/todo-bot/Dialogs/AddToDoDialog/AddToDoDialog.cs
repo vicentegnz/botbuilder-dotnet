@@ -33,7 +33,12 @@ namespace Microsoft.BotBuilderSamples
                     // @EntityName is a short-hand for turn.entities.<EntityName>. Other useful short-hands are 
                     //     #IntentName is a short-hand for turn.intents.<IntentName>
                     //     $PropertyName is a short-hand for dialog.results.<PropertyName>
-                    new SaveEntity("turn.addTodo.title", "@todoTitle[0]"),
+                    //new SaveEntity("turn.addTodo.title", "@todoTitle[0]"),
+                    new SaveEntity()
+                    {
+                        Property = "turn.addTodo.title",
+                        Entity = "turn.entities.todoTitle[0]"
+                    },
                     // TextInput by default will skip the prompt if the property has value.
                     new TextInput()
                     {
