@@ -112,18 +112,20 @@ namespace Microsoft.Bot.Builder.Dialogs.Loader.Tests
         {
             await BuildTestFlow("RepeatDialog.main.dialog")
             .SendConversationUpdate()
+                .AssertReply("RepeatDialog.main.dialog starting")
                 .AssertReply("Hello, what is your name?")
             .Send("Carlos")
-                .AssertReply("Hello Carlos, nice to meet you!")
+                .AssertReply("Hello Carlos, nice to meet you! (type cancel to end this)")
             .Send("hi")
-                .AssertReply("Hello Carlos, nice to meet you!")
+                .AssertReply("RepeatDialog.main.dialog starting")
+                .AssertReply("Hello Carlos, nice to meet you! (type cancel to end this)")
             .StartTestAsync();
         }
 
         [TestMethod]
         public async Task JsonDialogLoad_TraceAndLog()
         {
-            await BuildTestFlow("TraceAndLog.main.dialog", sendTraceActivity: true)
+            await BuildTestFlow("TraceAndLog.main.dialog", sendTrace: true)
             .SendConversationUpdate()
                 .AssertReply("Hello, what is your name?")
             .Send("Carlos")
@@ -145,6 +147,7 @@ namespace Microsoft.Bot.Builder.Dialogs.Loader.Tests
                 .AssertReply("Hello, I'm Zoidberg. What is your name?")
             .Send("Carlos")
                 .AssertReply("Hello Carlos, nice to talk to you!")
+                .AssertReply("Hey, I can tell you a joke, or tell your fortune")
             .Send("Do you know a joke?")
                 .AssertReply("Why did the chicken cross the road?")
             .Send("Why?")
@@ -160,11 +163,13 @@ namespace Microsoft.Bot.Builder.Dialogs.Loader.Tests
         public async Task JsonDialogLoad_BeginDialog()
         {
             await BuildTestFlow("BeginDialog.main.dialog")
-            .Send(new Activity(ActivityTypes.ConversationUpdate, membersAdded: new List<ChannelAccount>() { new ChannelAccount("bot", "Bot") }))
+            .Send(new Activity(ActivityTypes.ConversationUpdate, 
+                membersAdded: new List<ChannelAccount>() { new ChannelAccount("bot", "Bot")}))
             .SendConversationUpdate()
                 .AssertReply("Hello, I'm Zoidberg. What is your name?")
             .Send("Carlos")
                 .AssertReply("Hello Carlos, nice to talk to you!")
+                .AssertReply("Hey, I can tell you a joke, or tell your fortune")
             .Send("Do you know a joke?")
                 .AssertReply("Why did the chicken cross the road?")
             .Send("Why?")
@@ -267,32 +272,25 @@ namespace Microsoft.Bot.Builder.Dialogs.Loader.Tests
             .StartTestAsync();
         }
 
-        private TestFlow BuildTestFlow(string resourceName, bool sendTraceActivity = false)
+        private TestFlow BuildTestFlow(string resourceName, bool sendTrace = false)
         {
+            TypeFactory.Configuration = new ConfigurationBuilder().Build();
             string projPath = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, $@"..\..\..\..\..\samples\Microsoft.Bot.Builder.TestBot.Json\Microsoft.Bot.Builder.TestBot.Json.csproj"));
             var resourceExplorer = ResourceExplorer.LoadProject(projPath);
+            var lg = new LGLanguageGenerator(resourceExplorer);
+            var storage = new MemoryStorage();
+            var convoState = new ConversationState(storage);
+            var userState = new UserState(storage);
+            var adapter = new TestAdapter(TestAdapter.CreateConversation(TestContext.TestName), sendTrace);
+            adapter
+                .UseStorage(storage)
+                .UseState(userState, convoState)
+                .UseLanguageGenerator(lg)
+                .UseResourceExplorer(resourceExplorer)
+                .Use(new TranscriptLoggerMiddleware(new FileTranscriptLogger()));
 
             var resource = resourceExplorer.GetResource(resourceName);
             var dialog = DeclarativeTypeLoader.Load<IDialog>(resource, resourceExplorer, DebugSupport.SourceRegistry);
-
-            IStorage dataStore = new MemoryStorage();
-
-            var convoState = new ConversationState(new MemoryStorage());
-            var dialogState = convoState.CreateProperty<DialogState>("dialogState");
-
-            var lg = new LGLanguageGenerator(resourceExplorer);
-
-            var adapter = new TestAdapter(TestAdapter.CreateConversation(TestContext.TestName), sendTraceActivity: sendTraceActivity)
-                .Use(new TranscriptLoggerMiddleware(new FileTranscriptLogger()))
-                .Use(new AutoSaveStateMiddleware(convoState))
-                .Use(new RegisterClassMiddleware<ResourceExplorer>(resourceExplorer))
-                .Use(new RegisterClassMiddleware<ILanguageGenerator>(lg))
-                .Use(new RegisterClassMiddleware<IMessageActivityGenerator>(new TextMessageActivityGenerator(lg)))
-                .Use(new RegisterClassMiddleware<IStorage>(dataStore));
-
-            var dialogs = new DialogSet(dialogState);
-
-            dialogs.Add(dialog);
 
             return new TestFlow(adapter, async (turnContext, cancellationToken) =>
             {
