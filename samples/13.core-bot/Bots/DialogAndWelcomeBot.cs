@@ -23,7 +23,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             : base(conversationState, userState, dialog, logger)
         {
             // combine path for cross platform support
-            string[] paths = { ".", "Resources", "welcomeCard.LG" };
+            string[] paths = { ".", "Resources", "WelcomeCard.lg" };
             string fullPath = Path.Combine(paths);
             _lgEngine = TemplateEngine.FromFiles(fullPath);
         }

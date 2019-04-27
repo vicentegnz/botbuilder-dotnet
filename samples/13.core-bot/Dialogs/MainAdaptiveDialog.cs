@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.AI.Luis;
 using Microsoft.Bot.Builder.Dialogs;
@@ -7,6 +8,7 @@ using Microsoft.Bot.Builder.Dialogs.Adaptive;
 using Microsoft.Bot.Builder.Dialogs.Adaptive.Input;
 using Microsoft.Bot.Builder.Dialogs.Adaptive.Rules;
 using Microsoft.Bot.Builder.Dialogs.Adaptive.Steps;
+using Microsoft.Bot.Builder.Dialogs.Choices;
 using Microsoft.Bot.Builder.Expressions.Parser;
 using Microsoft.Extensions.Configuration;
 
@@ -60,7 +62,7 @@ namespace Microsoft.BotBuilderSamples.Dialogs
         {
             return new List<IRule>()
             {
-                // The intents here are based on intents defined in FlightBooking.LU file under the Resources folder
+                // The intents here are based on intents defined in MainAdaptiveDialog.LU file
                 new IntentRule("Book_flight")
                 {
                     Steps = new List<IDialog>()
@@ -70,39 +72,39 @@ namespace Microsoft.BotBuilderSamples.Dialogs
                         // Other short hands include -
                         //    - #intentName is a short-hand for turn.intents.<IntentName>
                         //    - $propertyName is a short-hand for dialog.results.<propertyName>
-                        new SaveEntity("dialog.flightBooking.destinationCity", "@ToCity"),
-                        new SaveEntity("dialog.flightBooking.departureCity", "@FromCity"),
-                        new SaveEntity("dialog.flightBooking.departureDate", "@datetimeV2"),
+                        //new CodeStep(testCodeStep),
+                        new SaveEntity("dialog.flightBooking.destinationCity", "@geographyV2[0]"),
+                        new SaveEntity("dialog.flightBooking.departureDate", "@datetimeV2[0]"),
                         // Steps to book flight
                         // Help and Cancel intents are always available since TextInput will always initiate
-                        // Consulatation up the parent dialog chain to see if anyone else wants to take this input.
+                        // Consulatation up the parent dialog chain to see if anyone else wants to take the user input.
                         new TextInput()
                         {
                             Property = "dialog.flightBooking.destinationCity",
-                            Prompt = new ActivityTemplate("What is your destination city?")
+                            Prompt = new ActivityTemplate("[PromptForMissingInformation]")
                         },
-                        new SendActivity("You said {dialog.flightBooking.destinationCity}"),
                         new TextInput()
                         {
                             Property = "dialog.flightBooking.departureCity",
-                            Prompt = new ActivityTemplate("What is your departure city?")
+                            Prompt = new ActivityTemplate("[PromptForMissingInformation]")
                         },
                         new TextInput()
                         {
                             Property = "dialog.flightBooking.departureDate",
-                            Prompt = new ActivityTemplate("What is your departure date?")
+                            Prompt = new ActivityTemplate("[PromptForMissingInformation]")
                         },
                         new ConfirmInput()
                         {
                             Property = "turn.confirmation",
-                            Prompt = new ActivityTemplate("[FlightBookingReadBack")
+                            Prompt = new ActivityTemplate("[ConfirmBooking]")
                         },
                         new IfCondition()
                         {
                             Condition = new ExpressionEngine().Parse("turn.confirmation == true"),
                             Steps = new List<IDialog>()
                             {
-                                new SendActivity("Your flight is confirmed!")
+                                // TODO: book flight.
+                                new SendActivity("[BookingConfirmation]")
                             },
                             ElseSteps = new List<IDialog>()
                             {
@@ -110,6 +112,59 @@ namespace Microsoft.BotBuilderSamples.Dialogs
                             }
                         },
                         new EndDialog()
+                    }
+                },
+                // This intent could fire when we are in the middle of book flight conversation.
+                // Just save any entities we might have recieved from LUIS and move forward with current conversation.
+                new IntentRule("GetMissingEntitiesForFlight")
+                {
+                    Steps = new List<IDialog>()
+                    {
+                        new LogStep()
+                        {
+                            Text = new TextTemplate(new ActivityTemplate("[Log-Trace]").ToString()),
+                            TraceActivity = true
+                        },
+                        // See if we have a geography entity. Confirm with user if they would like to use this as 
+                        // Departure or destination city.
+                        new IfCondition()
+                        {
+                            Condition = new ExpressionEngine().Parse("@geographyV2 != null && (dialog.flightBooking.destinationCity != null || dialog.flightBooking.departureCity != null)"),
+                            Steps = new List<IDialog>()
+                            {
+                                new ChoiceInput()
+                                {
+                                    Property = "turn.choiceOutcome",
+                                    Prompt = new ActivityTemplate("[Disambiguate-city]"),
+                                    Style = ListStyle.Auto,
+                                    Choices = new List<Choice>()
+                                    {
+                                        new Choice("Departure city"),
+                                        new Choice("Destination city")
+                                    }
+                                },
+                                new SwitchCondition()
+                                {
+                                    Condition = "turn.choiceOutcome",
+                                    Cases = new List<Case>()
+                                    {
+                                        new Case("Departure city") { Steps = new List<IDialog>() { new SaveEntity("dialog.flightBooking.departureCity", "@geographyV2[0]") } },
+                                        new Case("Destination city") { Steps = new List<IDialog>() { new SaveEntity("dialog.flightBooking.departureDate", "@datetimeV2[0]") } }
+                                    }
+                                }
+                            },
+                            ElseSteps = new List<IDialog>()
+                            {
+                                 new LogStep()
+                                 {
+                                    Text = new TextTemplate(new ActivityTemplate("[Log-Trace]").ToString()),
+                                    TraceActivity = true
+                                 },
+                                new SaveEntity("dialog.flightBooking.departureCity", "@geographyV2[0]")
+                            }
+                        },
+                        // Set any value received for datetime as departure date
+                        new SaveEntity("dialog.flightBooking.departureDate", "@datetimeV2[0]")
                     }
                 },
                 new IntentRule("Cancel")
@@ -125,8 +180,14 @@ namespace Microsoft.BotBuilderSamples.Dialogs
                 {
                     Steps = new List<IDialog>()
                     {
-                        new SendActivity("Hello, I'm the core bot! ")
-                        //new SendActivity("[BotOverview]")
+                        new SendActivity("[BotOverview]")
+                    }
+                },
+                new IntentRule("Greeting")
+                {
+                    Steps = new List<IDialog>()
+                    {
+                        new SendActivity("[BotOverview]")
                     }
                 },
                 new IntentRule("None")
@@ -134,8 +195,7 @@ namespace Microsoft.BotBuilderSamples.Dialogs
                     Steps = new List<IDialog>()
                     {
                         new SendActivity("I'm sorry, I do not understand that. Can you please rephrase what you are saying?"),
-                        // TODO: Add LG template with overview card and suggested actions. 
-                        //new SendActivity("[BotOverview]")
+                        new SendActivity("[BotOverview]")
                     }
                 }
             };
