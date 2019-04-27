@@ -98,9 +98,6 @@ $ todoTitle : simple
 - Forget the list
 - Purge the todo list
 
-> Add prebuilt number entity to help with index determination
-$ PREBUILT: number
-
 # ViewToDoDialog
 - show my todo
 - can you please show my todos?

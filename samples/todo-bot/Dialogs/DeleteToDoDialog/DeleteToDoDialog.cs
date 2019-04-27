@@ -38,6 +38,10 @@ namespace Microsoft.BotBuilderSamples
                     // todoIdx machine learned entity that can detect things like first or last etc. 
 
                     // As a demonstration for this example, use a code step to understand entities returned by LUIS.
+                    // You could have easily replaced the code step with these two steps
+                    // new SaveEntity("@todoTitle[0]", "turn.todoTitle"),
+                    // new SaveEntity("@todoTitle_patternAny[0]", "turn.todoTitle"),
+
                     new CodeStep(GetToDoTitleToDelete),
                     new IfCondition()
                     {
@@ -77,10 +81,14 @@ namespace Microsoft.BotBuilderSamples
                 },
                 Rules = new List<IRule>()
                 {
+                    // This event rule will catch outgoing bubbling up to the parent and will swallow anything that user says that is in the todo list. 
                     new EventRule()
                     {
+                        // Consultation happens on every turn when using TextInput. This gives all parents a chance to take the user input before text input takes it.
                         Events = new List<string>() { AdaptiveEvents.ConsultDialog },
-                        Constraint = "toLower(turn.activity.text) != 'cancel' && toLower(turn.activity.text) != 'help' && contains(user.todos, turn.activity.text)",
+                        // The expression language is quite powerful with a bunch of pre-built utility functions.
+                        // See https://github.com/Microsoft/BotBuilder-Samples/blob/master/experimental/common-expression-language/prebuilt-functions.md
+                        Constraint = "contains(user.todos, turn.activity.text)",
                         Steps = new List<IDialog>()
                         {
                             // Take user input  as the title of the todo to delete if it exists
@@ -105,23 +113,10 @@ namespace Microsoft.BotBuilderSamples
             // Demonstrates using a custom code step to extract entities and set them in state.
             var todoList = dc.State.GetValue<string[]>("user.todos");
             string todoTitleStr = null;
-            string[] numberEntity, todoTitle, todoTitle_patternAny, todoIdx;
-            dc.State.TryGetValue("turn.entities.number", out numberEntity);
+            string[] todoTitle, todoTitle_patternAny;
             dc.State.TryGetValue("turn.entities.todoTitle", out todoTitle);
             dc.State.TryGetValue("turn.entities.todoTitle_patternAny", out todoTitle_patternAny);
-            dc.State.TryGetValue("turn.entities.todoIdx", out todoIdx);
-            if (numberEntity != null && numberEntity.Length != 0)
-            {
-                todoTitleStr = todoList[Convert.ToInt16(numberEntity[0]) - 1];
-            }
-            else if (todoIdx != null && todoIdx.Length != 0)
-            {
-                if (todoIdx[0] == "first")
-                {
-                    todoTitleStr = todoList[0];
-                }
-            }
-            else if (todoTitle != null && todoTitle.Length != 0)
+            if (todoTitle != null && todoTitle.Length != 0)
             {
                 foreach(string todoItem in todoList)
                 {
@@ -145,6 +140,7 @@ namespace Microsoft.BotBuilderSamples
             }
             if (todoTitleStr != null)
             {
+                // Set the todo title in memory.
                 dc.State.SetValue("turn.todoTitle", todoTitleStr);
             }
             return new DialogTurnResult(DialogTurnStatus.Complete, options);
