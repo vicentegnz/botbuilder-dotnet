@@ -44,10 +44,7 @@ namespace Microsoft.BotBuilderSamples
                     
 
                     // Use a code step to determine the index of the todo to delete
-                    new CodeStep(GetToDoTitleToDelete)
-                    {
-                        OutputBinding = "turn.todoTitle"
-                    },
+                    new CodeStep(GetToDoTitleToDelete),
                     new IfCondition()
                     {
                         Condition = new ExpressionEngine().Parse("turn.todoTitle == null"),
@@ -66,7 +63,7 @@ namespace Microsoft.BotBuilderSamples
                     },
                     new EditArray()
                     {
-                        Property = "user.todos",
+                        ArrayProperty = "user.todos",
                         ItemProperty = "turn.todoTitle",
                         ChangeType = EditArray.ArrayChangeType.Remove
                     },
@@ -84,18 +81,49 @@ namespace Microsoft.BotBuilderSamples
         private async Task<DialogTurnResult> GetToDoTitleToDelete(DialogContext dc, System.Object options)
         {
             var todoList = dc.State.GetValue<string[]>("user.todos");
-            string numberEntity, todoTitle, todoTitle_patternAny, todoIdx;
+            string todoTitleStr = null;
+            string[] numberEntity, todoTitle, todoTitle_patternAny, todoIdx;
             dc.State.TryGetValue("turn.entities.number", out numberEntity);
             dc.State.TryGetValue("turn.entities.todoTitle", out todoTitle);
             dc.State.TryGetValue("turn.entities.todoTitle_patternAny", out todoTitle_patternAny);
             dc.State.TryGetValue("turn.entities.todoIdx", out todoIdx);
-            if (todoList == null && (numberEntity != null || todoTitle != null || todoTitle_patternAny != null || todoIdx != null)) {
-
+            if (numberEntity != null && numberEntity.Length != 0)
+            {
+                todoTitleStr = todoList[Convert.ToInt16(numberEntity[0]) - 1];
             }
-            
-            await dc.Context.SendActivityAsync(MessageFactory.Text("In custom code step"));
-            await dc.Context.SendActivityAsync(MessageFactory.Text(options.ToString()));
-            // This code step decided to just return the input payload as the result.
+            else if (todoIdx != null && todoIdx.Length != 0)
+            {
+                if (todoIdx[0] == "first")
+                {
+                    todoTitleStr = todoList[0];
+                }
+            }
+            else if (todoTitle != null && todoTitle.Length != 0)
+            {
+                foreach(string todoItem in todoList)
+                {
+                    if (todoItem == todoTitle[0])
+                    {
+                        todoTitleStr = todoTitle[0];
+                        break;
+                    }
+                }
+            }
+            else if (todoTitle_patternAny != null && todoTitle_patternAny.Length != 0)
+            {
+                foreach (string todoItem in todoList)
+                {
+                    if (todoItem == todoTitle_patternAny[0])
+                    {
+                        todoTitleStr = todoTitle_patternAny[0];
+                        break;
+                    }
+                }
+            }
+            if (todoTitleStr != null)
+            {
+                dc.State.SetValue("turn.todoTitle", todoTitleStr);
+            }
             return new DialogTurnResult(DialogTurnStatus.Complete, options);
         }
     }

@@ -543,7 +543,7 @@
       "intent": "DeleteToDoDialog"
     },
     {
-      "pattern": "Remove {todoTitle_patternAny} from my todo list",
+      "pattern": "Remove {todoTitle_patternAny} from my [todo] list",
       "intent": "DeleteToDoDialog"
     },
     {

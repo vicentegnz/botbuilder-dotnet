@@ -87,7 +87,7 @@ $ todoTitle : simple
 - I'm done with the first todo
 - I finished the {todoIdx = last} todo
 - Mark {todoTitle_patternAny} as complete
-- Remove {todoTitle_patternAny} from my todo list
+- Remove {todoTitle_patternAny} from my [todo] list
 - [Please] delete {todoTitle_patternAny} from the list
 - Remove the first todo
 - Delete todo
