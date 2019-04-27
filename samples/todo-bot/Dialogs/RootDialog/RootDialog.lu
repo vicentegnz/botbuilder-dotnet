@@ -58,12 +58,12 @@ $ todoTitle : simple
 - Add todo
 - add a to do item
 > Add some patterns
-- Please remember [to] {todoTitle.patternAny}
-- I need you to remember [that] {todoTitle.patternAny}
-- Add a todo named {todoTitle.patternAny}
-- Add {todoTitle.patternAny} to the list
-- [Please] add {todoTitle.patternAny} to the todo list
-- Add {todoTitle.patternAny} to my todo
+- Please remember [to] {todoTitle_patternAny}
+- I need you to remember [that] {todoTitle_patternAny}
+- Add a todo named {todoTitle_patternAny}
+- Add {todoTitle_patternAny} to the list
+- [Please] add {todoTitle_patternAny} to the todo list
+- Add {todoTitle_patternAny} to my todo
 - Please remind me to {todoTitle=buy milk}
 - Please remember that I need to {todoTitle=buy milk}
 - I need you to remember that {todoTitle=my wife's birthday is Jan 9th}
@@ -71,20 +71,35 @@ $ todoTitle : simple
 - Add {todoTitle=get a new car} to the todo list
 - Add {todoTitle=write a spec} to the list
 - Add {todoTitle=finish this demo} to my todo list
+- add another one
+- add
 
 # DeleteToDoDialog
 - Remove todo
-- Mark {todoTitle} as complete
-- Remove {todoTitle} from my todo list
-- [Please] delete {todoTitle} from the list
+- Mark {todoTitle = buy milk} as complete
+- Flag {todoTitle = first one} as done
+- Remove {todoTitle = finish this demo} from the todo list
+- remove another one
+- remove
+- clear my todo named {todoTitle = get a new car}
+- I did {todoTitle_patternAny}
+- I completed {todoTitle_patternAny}
+- I'm done with the first todo
+- I finished the {todoIdx = last} todo
+- Mark {todoTitle_patternAny} as complete
+- Remove {todoTitle_patternAny} from my todo list
+- [Please] delete {todoTitle_patternAny} from the list
 - Remove the first todo
 - Delete todo
-- Delete {todoTitle}
+- Delete {todoTitle_patternAny}
 - Clear my todos
 - Delete all my todos
 - Remove all my todo
 - Forget the list
 - Purge the todo list
+
+> Add prebuilt number entity to help with index determination
+$ PREBUILT: number
 
 # ViewToDoDialog
 - show my todo
@@ -100,3 +115,7 @@ $ todoTitle : simple
 - I hope I do not have any todo left
 - do i have any tasks left?
 - hit me up with more items
+- view my todos
+- can you show my todo
+- see todo
+- I would like to see my todos list

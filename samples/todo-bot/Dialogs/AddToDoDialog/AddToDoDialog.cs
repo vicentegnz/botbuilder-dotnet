@@ -47,7 +47,7 @@ namespace Microsoft.BotBuilderSamples
                         Property = "turn.todoTitle",
                         Prompt = new ActivityTemplate("[Get-ToDo-Title]")
                     },
-                    // Add the new todo title to the list of todos
+                    // Add the new todo title to the list of todos. Keep the list of todos in the user scope.
                     new EditArray()
                     {
                         ItemProperty = "turn.todoTitle",
@@ -93,8 +93,7 @@ namespace Microsoft.BotBuilderSamples
                                 // We do not need to specify an else block here since if user said no,
                                 // the control flow will automatically return to the last active step (if any)
                             },
-                            //new SendActivity("Confirmation outcome: {turn.addTodo.cancelConfirmation}")
-
+                            new SendActivity("Confirmation outcome: {turn.addTodo.cancelConfirmation}")
                         }
                     },
                     // Since we are using a regex recognizer, anything except for help or cancel will come back as none intent.

@@ -11,6 +11,7 @@ using Microsoft.Bot.Builder.Dialogs.Adaptive.Rules;
 using Microsoft.Bot.Builder.Dialogs.Adaptive.Steps;
 using Microsoft.Bot.Builder.Dialogs.Adaptive.Input;
 using Microsoft.Bot.Builder.Expressions.Parser;
+using Microsoft.Bot.Builder.Dialogs.Adaptive.Recognizers;
 
 namespace Microsoft.BotBuilderSamples
 {
