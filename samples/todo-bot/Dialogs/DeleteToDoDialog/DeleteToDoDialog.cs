@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Adaptive;
 using Microsoft.Bot.Builder.Dialogs.Adaptive.Input;
 using Microsoft.Bot.Builder.Dialogs.Adaptive.Steps;
-using Microsoft.Bot.Builder.Dialogs.Choices;
 using Microsoft.Bot.Builder.Expressions.Parser;
-using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.BotBuilderSamples
 {
@@ -21,8 +17,6 @@ namespace Microsoft.BotBuilderSamples
             // Create instance of adaptive dialog. 
             var DeleteToDoDialog = new AdaptiveDialog(nameof(AdaptiveDialog))
             {
-                // Note: that 'Help' and 'Cancel' are not locally handled here.
-                // You will automatically see global 'Help' and 'Cancel' from the RootDialog.
                 Steps = new List<IDialog>()
                 {
                     // Handle case where there are no items in todo list
@@ -41,9 +35,8 @@ namespace Microsoft.BotBuilderSamples
                     // todoTitle_patternAny as pattern.any LUIS entity .or.
                     // prebuilt number entity that denotes the position of the todo item in the list .or.
                     // todoIdx machine learned entity that can detect things like first or last etc. 
-                    
 
-                    // Use a code step to determine the index of the todo to delete
+                    // As a demonstration for this example, use a code step to understand entities returned by LUIS.
                     new CodeStep(GetToDoTitleToDelete),
                     new IfCondition()
                     {
@@ -52,13 +45,24 @@ namespace Microsoft.BotBuilderSamples
                         {
                             // First show the current list of Todos
                             new BeginDialog(nameof(ViewToDoDialog)),
-                            new ChoiceInput()
+                            new TextInput()
                             {
                                 Property = "turn.todoTitle",
                                 Prompt = new ActivityTemplate("[Get-ToDo-Title-To-Delete]"),
-                                Style = ListStyle.Auto,
-                                ChoicesProperty = "user.todos"
                             }
+                        }
+                    },
+                    new IfCondition()
+                    {
+                        Condition = new ExpressionEngine().Parse("contains(user.todos, turn.todoTitle) == false"),
+                        Steps = new List<IDialog>()
+                        {
+                            new SendActivity("[Todo-not-found]"),
+                            new DeleteProperty()
+                            {
+                                Property = "turn.todoTitle"
+                            },
+                            new RepeatDialog()
                         }
                     },
                     new EditArray()
@@ -67,7 +71,8 @@ namespace Microsoft.BotBuilderSamples
                         ItemProperty = "turn.todoTitle",
                         ChangeType = EditArray.ArrayChangeType.Remove
                     },
-                    new SendActivity("[Delete-readBack]")
+                    new SendActivity("[Delete-readBack]"),
+                    new EndDialog()
                 }
             };
 
@@ -80,6 +85,7 @@ namespace Microsoft.BotBuilderSamples
 
         private async Task<DialogTurnResult> GetToDoTitleToDelete(DialogContext dc, System.Object options)
         {
+            // Demonstrates using a custom code step to extract entities and set them in state.
             var todoList = dc.State.GetValue<string[]>("user.todos");
             string todoTitleStr = null;
             string[] numberEntity, todoTitle, todoTitle_patternAny, todoIdx;

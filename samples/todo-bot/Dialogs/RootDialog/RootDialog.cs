@@ -40,7 +40,8 @@ namespace Microsoft.BotBuilderSamples
                     new IntentRule("Help")             { Steps = new List<IDialog>() { new SendActivity("[Help-Root-Dialog]") } },
                     new IntentRule("Cancel")           { Steps = new List<IDialog>() {
                             // This is the global cancel in case a child dialog did not explicit handle cancel.
-                            new SendActivity("Cancelling.."),
+                            new SendActivity("Cancelling all dialogs.."),
+                            new SendActivity("[Welcome-Actions]"),
                             new CancelAllDialogs(),
                         }
                     }

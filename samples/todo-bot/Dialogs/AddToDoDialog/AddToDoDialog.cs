@@ -7,14 +7,11 @@ using Microsoft.Bot.Builder.Dialogs.Adaptive.Recognizers;
 using Microsoft.Bot.Builder.Dialogs.Adaptive.Rules;
 using Microsoft.Bot.Builder.Dialogs.Adaptive.Steps;
 using Microsoft.Bot.Builder.Expressions.Parser;
-using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.BotBuilderSamples
 {
     public class AddToDoDialog : ComponentDialog
     {
-        private static IConfiguration Configuration;
-
         public AddToDoDialog()
             : base(nameof(AddToDoDialog))
         {
@@ -83,17 +80,16 @@ namespace Microsoft.BotBuilderSamples
                                 Condition = new ExpressionEngine().Parse("turn.addTodo.cancelConfirmation == true"),
                                 Steps = new List<IDialog>()
                                 {
-                                    new SendActivity("Cancelling add todo..."),
+                                    new SendActivity("[Cancel-add-todo]"),
                                     new EndDialog()
                                 },
                                 ElseSteps = new List<IDialog>()
                                 {
-                                    new SendActivity("Sure, no problem..")
+                                    new SendActivity("[Help-prefix], let's get right back to adding a todo.")
                                 }
                                 // We do not need to specify an else block here since if user said no,
                                 // the control flow will automatically return to the last active step (if any)
-                            },
-                            new SendActivity("Confirmation outcome: {turn.addTodo.cancelConfirmation}")
+                            }
                         }
                     },
                     // Since we are using a regex recognizer, anything except for help or cancel will come back as none intent.

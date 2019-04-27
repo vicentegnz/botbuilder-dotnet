@@ -12,3 +12,6 @@ Ok, I've removed your todo titled "@{turn.todoTitle}".
 
 # Delete-Empty-List
 - You do not have any items in your todo list.
+
+# Todo-not-found
+- Sorry, I did not find a todo titled {turn.todoTitle} in your todos list.
