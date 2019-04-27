@@ -17,9 +17,6 @@
     },
     {
       "name": "ViewToDoDialog"
-    },
-    {
-      "name": "None"
     }
   ],
   "entities": [
@@ -506,11 +503,6 @@
       "text": "I would like to see my todos list",
       "intent": "ViewToDoDialog",
       "entities": []
-    },
-    {
-      "text": "{todoTitle_patternAny}",
-      "intent": "None",
-      "entities": []
     }
   ],
   "patterns": [
@@ -561,10 +553,6 @@
     {
       "pattern": "Delete {todoTitle_patternAny}",
       "intent": "DeleteToDoDialog"
-    },
-    {
-      "pattern": "{todoTitle_patternAny}",
-      "intent": "None"
     }
   ],
   "patternAnyEntities": [

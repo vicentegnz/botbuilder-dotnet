@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Adaptive;
 using Microsoft.Bot.Builder.Dialogs.Adaptive.Input;
+using Microsoft.Bot.Builder.Dialogs.Adaptive.Rules;
 using Microsoft.Bot.Builder.Dialogs.Adaptive.Steps;
 using Microsoft.Bot.Builder.Expressions.Parser;
 
@@ -73,6 +74,22 @@ namespace Microsoft.BotBuilderSamples
                     },
                     new SendActivity("[Delete-readBack]"),
                     new EndDialog()
+                },
+                Rules = new List<IRule>()
+                {
+                    new EventRule()
+                    {
+                        Events = new List<string>() { AdaptiveEvents.ConsultDialog },
+                        Constraint = "toLower(turn.activity.text) != 'cancel' && toLower(turn.activity.text) != 'help' && contains(user.todos, turn.activity.text)",
+                        Steps = new List<IDialog>()
+                        {
+                            // Take user input  as the title of the todo to delete if it exists
+                            new SetProperty() {
+                                Property = "turn.todoTitle",
+                                Value = new ExpressionEngine().Parse("turn.activity.text")
+                            }
+                        }
+                    }
                 }
             };
 

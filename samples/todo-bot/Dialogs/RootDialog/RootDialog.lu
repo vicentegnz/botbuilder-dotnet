@@ -120,7 +120,3 @@ $ PREBUILT: number
 - see todo
 - I would like to see my todos list
 
-# None
-> Add a pattern.any uttereance to none intent. 
-> This will help catch arbitrary utterances as the title of the todo.
-- {todoTitle_patternAny}
