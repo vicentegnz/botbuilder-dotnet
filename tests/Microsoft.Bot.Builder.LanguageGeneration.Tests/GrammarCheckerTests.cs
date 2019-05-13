@@ -6,6 +6,9 @@ using Microsoft.Bot.Builder.LanguageGeneration;
 using Microsoft.Bot.Builder.LanguageGeneration.GrmCheckers;
 using System.Linq;
 using System.IO;
+using Microsoft.Bot.Builder.Adapters;
+using Microsoft.Bot.Schema;
+using System.Threading.Tasks;
 
 namespace Microsoft.Bot.Builder.LanguageGeneration.Tests
 {
@@ -65,6 +68,23 @@ namespace Microsoft.Bot.Builder.LanguageGeneration.Tests
             string truth_sent = "there are 54 cheap restaurants.";
             string result = gc.Transform(orgin_sent, context);
             Assert.AreEqual(truth_sent, result);
+        }
+
+        [TestMethod]
+        public async Task GrammarCheckerMiddlerwareTest()
+        {
+            var adapter = new TestAdapter(TestAdapter.CreateConversation("gc"))
+                                .Use(new GrammarCheckerMiddleware());
+
+            await new TestFlow(adapter, async (context, cancellationToken) =>
+            {
+                var replyActivity = new Activity(type: ActivityTypes.Message, text: context.Activity.Text);
+                await context.SendActivityAsync(replyActivity);
+            })
+                .Send("It's about 12 mile away").AssertReply("It's about 12 miles away")
+                .Send("An useful tool").AssertReply("A useful tool")
+                .Send("there is 54 cheap restaurants.").AssertReply("there are 54 cheap restaurants.")
+                .StartTestAsync();
         }
     }
 }
