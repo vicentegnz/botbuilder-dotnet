@@ -1,0 +1,32 @@
+{
+    "$schema": "../../app.schema",
+    "$type": "Microsoft.AdaptiveDialog",
+    "steps": [
+    {
+      "$type": "Microsoft.IfCondition",
+      "condition": "dialog.token == null",
+      "steps": [
+        {
+          "$type": "Microsoft.OAuthPrompt",
+          "ConnectionName": "msgraph",
+          "Title": "Log in",
+          "Text": "Please log in to your calendar account",
+          "Property": "dialog.token"
+        }
+      ]
+    },
+      {
+        "$type": "Microsoft.RemoteCall",
+        "url": "https://bfcalendarskill.azurewebsites.net/api/skill/messages",
+        "tokenProperty": "{dialog.token}"
+      },
+    {
+      "$type": "Microsoft.TextInput",
+      "property": "dialog.word",
+      "prompt": ""
+    },
+    {
+      "$type": "Microsoft.RepeatDialog"
+    }
+  ]
+}

@@ -51,37 +51,25 @@ namespace Microsoft.Bot.Builder.TestBot.Json
         {
             System.Diagnostics.Trace.TraceInformation("Loading resources...");
 
-            this.rootDialog = new AdaptiveDialog()
-            {
-                AutoEndDialog = false,
-                Steps = new List<IDialog>()
-            };
-            var choiceInput = new ChoiceInput()
-            {
-                Prompt = new ActivityTemplate("What declarative sample do you want to run?"),
-                OutputBinding = "conversation.dialogChoice",
-                AlwaysPrompt = true,
-                Choices = new List<Choice>()
-            };
+            //this.rootDialog = new AdaptiveDialog()
+            //{
+            //    AutoEndDialog = false,
+            //    Steps = new List<IDialog>()
+            //};
+            //var textInput = new TextInput();
+            //textInput.Prompt = new ActivityTemplate("");
+            //textInput.Property = "dialog.word";
 
-            var handleChoice = new SwitchCondition()
-            {
-                Condition = "conversation.dialogChoice",
-                Cases = new List<Case>()
-            };
+            //var remoteCall = new RemoteCall();
+            //remoteCall.Url = "https://bfcalendarskill.azurewebsites.net/api/skill/messages";
 
-            foreach (var resource in this.resourceExplorer.GetResources(".dialog").Where(r => r.Id.EndsWith(".main.dialog")))
-            {
-                var name = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(resource.Id));
-                choiceInput.Choices.Add(new Choice(name));
-                var dialog = DeclarativeTypeLoader.Load<IDialog>(resource, this.resourceExplorer, DebugSupport.SourceRegistry);
-                handleChoice.Cases.Add(new Case($"'{name}'", new List<IDialog>() { dialog }));
-            }
-            choiceInput.Style = ListStyle.Auto;
-            this.rootDialog.Steps.Add(choiceInput);
-            this.rootDialog.Steps.Add(new SendActivity("# Running {conversation.dialogChoice}.main.dialog"));
-            this.rootDialog.Steps.Add(handleChoice);
-            this.rootDialog.Steps.Add(new RepeatDialog());
+            //this.rootDialog.Steps.Add(remoteCall);
+            //this.rootDialog.Steps.Add(textInput);
+            //this.rootDialog.Steps.Add(new RepeatDialog());
+            var rootDialogFile = "RemoteCall.main.dialog";
+            var rootFile = resourceExplorer.GetResource(rootDialogFile);
+
+            rootDialog = DeclarativeTypeLoader.Load<AdaptiveDialog>(rootFile, resourceExplorer, DebugSupport.SourceRegistry);
 
             System.Diagnostics.Trace.TraceInformation("Done loading resources.");
         }
