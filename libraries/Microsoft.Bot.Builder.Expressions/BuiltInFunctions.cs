@@ -1459,6 +1459,21 @@ namespace Microsoft.Bot.Builder.Expressions
                     ReturnType.Number,
                     (expression) => ValidateArityAndAnyType(expression, 1, 1, ReturnType.Number)),
                 new ExpressionEvaluator(
+                    ExpressionType.Guid,
+                    Apply(args => Guid.NewGuid().ToString()),
+                    ReturnType.String,
+                    (expression) => ValidateArityAndAnyType(expression, 0, 0)),
+                new ExpressionEvaluator(
+                    ExpressionType.IndexOf,
+                    Apply(args => args[0].IndexOf(args[1]), VerifyString),
+                    ReturnType.Number,
+                    (expression) => ValidateArityAndAnyType(expression, 2, 2, ReturnType.String)),
+                new ExpressionEvaluator(
+                    ExpressionType.LastIndexOf,
+                    Apply(args => args[0].LastIndexOf(args[1]), VerifyString),
+                    ReturnType.Number,
+                    (expression) => ValidateArityAndAnyType(expression, 2, 2, ReturnType.String)),
+                new ExpressionEvaluator(
                     ExpressionType.Join,
                     (expression, state) =>
                     {

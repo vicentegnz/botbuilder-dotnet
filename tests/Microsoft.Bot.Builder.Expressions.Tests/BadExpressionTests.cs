@@ -110,6 +110,15 @@ namespace Microsoft.Bot.Builder.Expressions.Tests
             Test("countWord(one)"),// should have string param
             Test("addOrdinal(one)"),// should have Integer param
             Test("addOrdinal(one, two)"),// should have one param
+            Test("guid(one)"), // should have no parameters
+            Test("indexOf(hello)"), // should have two parameters
+            Test("indexOf(hello, world, one)"), // should have two parameters
+            Test("indexOf(hello, one)"), // both parameters should be string
+            Test("indexOf(one, hello)"), // both parameters should be string
+            Test("lastIndexOf(hello)"),// should have two parameters
+            Test("lastIndexOf(hello, world, one)"), // should have two parameters
+            Test("lastIndexOf(hello, one)"), // both parameters should be string
+            Test("lastIndexOf(one, hello)"), // both parameters should be string
             # endregion
 
             # region Logical comparison functions test

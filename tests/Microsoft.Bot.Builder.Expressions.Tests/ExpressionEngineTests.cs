@@ -176,7 +176,13 @@ namespace Microsoft.Bot.Builder.Expressions.Tests
             Test("addOrdinal(11 + 12)", "23rd"),
             Test("addOrdinal(11 + 13)", "24th"),
             Test("addOrdinal(-1)", "-1"),//original string value
-            
+            Test("count(guid())", 36),
+            Test("guid().indexOf('-')", 8),
+            Test("indexOf(guid(), '-')", 8),
+            Test("indexOf(hello, '-')", -1),
+            Test("guid().lastIndexOf('-')", 23),
+            Test("lastIndexOf(guid(), '-')", 23),
+            Test("lastIndexOf(hello, '-')", -1),
             # endregion
 
             # region  Logical comparison functions test

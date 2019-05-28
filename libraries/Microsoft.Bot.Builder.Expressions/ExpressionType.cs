@@ -49,6 +49,9 @@ namespace Microsoft.Bot.Builder.Expressions
         public const string StartsWith = "startsWith";
         public const string CountWord = "countWord";
         public const string AddOrdinal = "addOrdinal";
+        public const string Guid = "guid";
+        public const string IndexOf = "indexOf";
+        public const string LastIndexOf = "lastIndexOf";
 
         // Collection
         public const string Count = "count";
